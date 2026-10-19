@@ -15,16 +15,15 @@
       --sub: #64748b;
       --yeona-main: #ec4899;
       --yeonwoo-main: #3b82f6;
-      --PX_PER_MIN: 2;
+      --px-per-min: 2; /* PC 기본: 1분 = 2px (1시간 = 120px) */
+      --axis-width: 58px;
+      --col-gap: 10px;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard', -apple-system, sans-serif; }
-    body { background: var(--bg); color: var(--text); padding-bottom: 60px; -webkit-tap-highlight-color: transparent; }
+    body { background: var(--bg); color: var(--text); padding-bottom: 50px; -webkit-tap-highlight-color: transparent; }
 
-    /* 공통: 절대 줄바꿈 방지 유틸 */
-    .nowrap { white-space: nowrap; }
-
-    /* 상단 고정 헤더 */
+    /* 상단 헤더 */
     header {
       background: rgba(255, 255, 255, 0.96); backdrop-filter: blur(8px);
       border-bottom: 1px solid #e2e8f0; padding: 12px 14px;
@@ -32,19 +31,19 @@
     }
     .header-inner { max-width: 1120px; margin: 0 auto; display: flex; flex-direction: column; gap: 10px; }
     
-    .top-bar { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
-    .brand { display: flex; align-items: center; gap: 8px; }
+    .top-bar { display: flex; justify-content: space-between; align-items: center; gap: 6px; flex-wrap: nowrap; }
+    .brand { display: flex; align-items: center; gap: 8px; min-width: 0; }
     .brand h1 { font-family: 'Jua', sans-serif; font-size: 1.4rem; font-weight: 400; color: #0f172a; white-space: nowrap; }
 
     .sync-pill {
-      font-size: 0.74rem; font-weight: 800; padding: 4px 9px; border-radius: 99px;
+      font-size: 0.72rem; font-weight: 800; padding: 3px 8px; border-radius: 99px;
       background: #e2e8f0; color: #475569; white-space: nowrap;
     }
     .sync-pill.ok { background: #dcfce7; color: #15803d; }
     .sync-pill.loading { background: #fef9c3; color: #854d0e; }
     .sync-pill.err { background: #fee2e2; color: #b91c1c; }
 
-    .ctrl-btns { display: flex; gap: 6px; align-items: center; }
+    .ctrl-btns { display: flex; gap: 5px; align-items: center; flex-shrink: 0; }
     .btn {
       border: 1px solid #cbd5e1; background: #fff; color: #334155;
       padding: 7px 11px; border-radius: 9px; font-size: 0.8rem; font-weight: 800;
@@ -52,10 +51,10 @@
     }
     .btn.add-btn { background: #4f46e5; color: #fff; border-color: #4f46e5; }
 
-    /* 상단 어린이 선택 탭 (한 줄 고정) */
+    /* 상단 어린이 선택 탭 */
     .tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
     .tab {
-      padding: 10px 6px; border-radius: 12px; border: 2px solid #e2e8f0;
+      padding: 10px 4px; border-radius: 12px; border: 2px solid #e2e8f0;
       background: #f8fafc; color: #64748b; font-family: 'Jua', sans-serif;
       font-size: 1.05rem; cursor: pointer; text-align: center; white-space: nowrap;
       transition: 0.15s;
@@ -64,50 +63,24 @@
     .tab.active[data-filter="연아"] { background: var(--yeona-main); color: #fff; border-color: var(--yeona-main); }
     .tab.active[data-filter="연우"] { background: var(--yeonwoo-main); color: #fff; border-color: var(--yeonwoo-main); }
 
-    /* 모바일 전용 보기 방식 스위치 (요일별 크게 보기 vs 주간 5일 한눈에) */
-    .mobile-view-Toolbar {
-      display: none; background: #eef2ff; padding: 8px 10px; border-radius: 12px;
-      justify-content: space-between; align-items: center; gap: 8px;
-      border: 1px solid #c7d2fe;
-    }
-    .day-selector { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; flex: 1; }
-    .day-sel-btn {
-      padding: 7px 0; border-radius: 9px; border: 1.5px solid #cbd5e1;
-      background: #fff; color: #475569; font-family: 'Jua', sans-serif; font-size: 0.95rem;
-      cursor: pointer; text-align: center; white-space: nowrap;
-    }
-    .day-sel-btn.active { background: #4f46e5; color: #fff; border-color: #4f46e5; }
-    .day-sel-btn.today-dot { position: relative; }
-    .day-sel-btn.today-dot::after {
-      content: ''; position: absolute; top: 3px; right: 4px; width: 6px; height: 6px;
-      border-radius: 50%; background: #ef4444;
-    }
-    .day-sel-btn.active.today-dot::after { background: #fde047; }
-
-    .mode-switch-btn {
-      padding: 7px 10px; border-radius: 9px; border: 1.5px solid #4f46e5;
-      background: #fff; color: #4f46e5; font-size: 0.78rem; font-weight: 900;
-      white-space: nowrap; cursor: pointer;
-    }
-    .mode-switch-btn.active { background: #4f46e5; color: #fff; }
-
-    /* 메인 컨테이너 */
-    main { max-width: 1120px; margin: 18px auto; padding: 0 12px; display: flex; flex-direction: column; gap: 28px; }
+    /* 메인 보드 영역 */
+    main { max-width: 1120px; margin: 20px auto; padding: 0 12px; display: flex; flex-direction: column; gap: 28px; }
 
     .timetable-card {
-      background: var(--board-bg); border-radius: 24px; padding: 20px 18px;
+      background: var(--board-bg); border-radius: 24px; padding: 22px 18px 26px;
       box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06); border: 2px solid #e2e8f0;
+      overflow: hidden;
     }
     .timetable-card.yeona-theme { border-color: #fbcfe8; }
     .timetable-card.yeonwoo-theme { border-color: #bfdbfe; }
 
-    /* 보드 타이틀 영역 (절대 줄바꿈 안 되도록 일렬 배치) */
+    /* 보드 상단 제목 줄 */
     .board-title-wrap {
       display: flex; justify-content: space-between; align-items: center;
       margin-bottom: 14px; gap: 8px; flex-wrap: nowrap;
     }
     .board-main-title {
-      font-family: 'Jua', sans-serif; font-size: clamp(1.35rem, 4.5vw, 1.9rem);
+      font-family: 'Jua', sans-serif; font-size: 1.85rem;
       display: flex; align-items: center; gap: 8px; white-space: nowrap;
     }
     .yeona-theme .board-main-title { color: #be185d; }
@@ -121,62 +94,76 @@
     .yeonwoo-theme .title-badge { background: #dbeafe; color: #1d4ed8; }
 
     .quick-person-add {
-      font-size: 0.78rem; font-weight: 800; padding: 6px 10px; border-radius: 9px;
+      font-size: 0.8rem; font-weight: 800; padding: 7px 12px; border-radius: 10px;
       border: 1.5px solid currentColor; background: #fff; cursor: pointer; white-space: nowrap;
     }
     .yeona-theme .quick-person-add { color: #be185d; }
     .yeonwoo-theme .quick-person-add { color: #1d4ed8; }
 
-    /* =====================================================
-       1) PC 데스크톱 타임라인 뷰 (기본)
-       ===================================================== */
-    .desktop-timeline { display: block; }
+    /* =========================================================
+       PC & 모바일 공통 시간 비례 타임라인 그리드 (5열 고정)
+       ========================================================= */
     .day-header-row {
-      display: grid; grid-template-columns: 64px repeat(5, 1fr); gap: 10px;
-      margin-bottom: 12px; align-items: center;
+      display: grid;
+      grid-template-columns: var(--axis-width) repeat(5, minmax(0, 1fr));
+      gap: var(--col-gap);
+      margin-bottom: 10px;
+      align-items: center;
     }
-    .corner-empty { text-align: center; font-size: 0.78rem; font-weight: 800; color: #94a3b8; }
+    .corner-empty {
+      text-align: right; padding-right: 6px;
+      font-size: 0.78rem; font-weight: 800; color: #94a3b8; white-space: nowrap;
+    }
 
     .day-pill {
-      padding: 10px 6px; border-radius: 14px; text-align: center;
+      padding: 10px 4px; border-radius: 14px; text-align: center;
       font-family: 'Jua', sans-serif; font-size: 1.2rem; cursor: pointer;
-      white-space: nowrap; transition: 0.12s;
+      white-space: nowrap; transition: 0.12s; user-select: none;
     }
     .yeona-theme .day-pill { background: #ffe4e6; color: #9f1239; border: 2px solid #fecdd3; }
     .yeonwoo-theme .day-pill { background: #e0f2fe; color: #075985; border: 2px solid #bae6fd; }
     .day-pill.is-today {
       background: #fef08a !important; color: #854d0e !important; border-color: #facc15 !important;
+      box-shadow: 0 3px 10px rgba(250, 204, 21, 0.3);
     }
     .day-pill .add-hint {
-      display: block; font-family: 'Pretendard', sans-serif; font-size: 0.68rem; font-weight: 800; opacity: 0.75;
+      display: block; font-family: 'Pretendard', sans-serif; font-size: 0.68rem;
+      font-weight: 800; opacity: 0.75; margin-top: 1px;
     }
 
+    /* 타임라인 본체 */
     .timeline-body {
-      display: grid; grid-template-columns: 64px repeat(5, 1fr); gap: 10px;
-      position: relative; height: 660px;
+      display: grid;
+      grid-template-columns: var(--axis-width) repeat(5, minmax(0, 1fr));
+      gap: var(--col-gap);
+      position: relative;
+      /* 높이는 JS에서 (5.5시간 * 60분 * pxPerMin)으로 자동 설정 */
     }
+
+    /* 왼쪽 시간 눈금 열 */
     .time-axis { position: relative; height: 100%; }
     .time-marker {
       position: absolute; left: 0; right: 6px; text-align: right;
-      font-size: 0.84rem; font-weight: 800; color: #64748b; transform: translateY(-50%);
+      font-size: 0.84rem; font-weight: 800; color: #64748b;
+      transform: translateY(-50%); white-space: nowrap;
     }
 
+    /* 요일별 기둥 트랙 */
     .day-track {
       position: relative; height: 100%; border-radius: 16px;
       background-color: #f8fafc; border: 1.5px solid #e2e8f0;
-      background-image:
-        linear-gradient(to bottom, #e2e8f0 1px, transparent 1px),
-        linear-gradient(to bottom, #eef2f6 1px, transparent 1px);
-      background-size: 100% 120px, 100% 60px;
       overflow: hidden; cursor: pointer;
     }
-    .day-track.is-today { background-color: #fefce8; border-color: #fde047; }
+    .day-track.is-today {
+      background-color: #fefce8; border-color: #facc15;
+    }
 
+    /* 시간 비례 과목 스티커 블록 */
     .schedule-block {
-      position: absolute; left: 5px; right: 5px; border-radius: 12px; padding: 6px 8px;
+      position: absolute; left: 5px; right: 5px; border-radius: 12px; padding: 6px 6px;
       display: flex; flex-direction: column; justify-content: center; align-items: center;
       text-align: center; cursor: pointer; z-index: 10;
-      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.07);
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.06);
       border: 2px solid transparent; border-bottom-width: 4px;
       transition: transform 0.12s; overflow: hidden;
     }
@@ -184,102 +171,44 @@
 
     .block-time {
       font-size: 0.74rem; font-weight: 800; padding: 1px 6px;
-      border-radius: 99px; background: rgba(255, 255, 255, 0.85);
-      margin-bottom: 3px; white-space: nowrap;
+      border-radius: 99px; background: rgba(255, 255, 255, 0.88);
+      margin-bottom: 3px; white-space: nowrap; line-height: 1.2;
     }
     .block-subject {
-      font-family: 'Jua', sans-serif; font-size: 1.15rem; line-height: 1.15; white-space: nowrap;
+      font-family: 'Jua', sans-serif; font-size: 1.15rem;
+      line-height: 1.15; word-break: keep-all;
     }
 
-    /* 짧은 수업(42분 이하)은 가로 배치로 글자 잘림 방지 */
-    .schedule-block.compact {
-      flex-direction: row; justify-content: space-between; padding: 4px 10px; gap: 4px;
+    /* PC에서 40분 이하 짧은 수업은 가로 일렬 배치 */
+    @media (min-width: 769px) {
+      .schedule-block.compact {
+        flex-direction: row; justify-content: space-between; padding: 4px 10px; gap: 4px;
+      }
+      .schedule-block.compact .block-time { margin-bottom: 0; font-size: 0.72rem; }
+      .schedule-block.compact .block-subject { font-size: 1.05rem; }
     }
-    .schedule-block.compact .block-time { margin-bottom: 0; font-size: 0.7rem; padding: 1px 5px; }
-    .schedule-block.compact .block-subject { font-size: 1.02rem; }
 
-    /* 현재 시각 가로선 (글자를 가리지 않도록 우측 끝에 작은 점으로 표시) */
+    /* 현재 시간 빨간 가로선 */
     .now-line {
       position: absolute; left: 0; right: 0; height: 2px;
-      background: rgba(239, 68, 68, 0.65); z-index: 20; pointer-events: none;
+      background: #ef4444; z-index: 22; pointer-events: none;
     }
     .now-line::after {
-      content: '현재'; position: absolute; right: 4px; top: -16px;
-      background: #ef4444; color: #fff; font-size: 0.62rem; font-weight: 900;
-      padding: 1px 5px; border-radius: 4px;
+      content: '현재'; position: absolute; right: 3px; top: -15px;
+      background: #ef4444; color: #fff; font-size: 0.6rem; font-weight: 900;
+      padding: 1px 4px; border-radius: 4px; line-height: 1.1;
     }
-
-    /* =====================================================
-       2) 모바일 전용 뷰 (요일별 카드형 & 5일 한눈에 그리드)
-       ===================================================== */
-    .mobile-container { display: none; }
-
-    /* (A) 모바일 요일별 큼직한 타임 카드 뷰 */
-    .m-day-list { display: flex; flex-direction: column; gap: 10px; }
-    .m-card {
-      display: flex; align-items: center; justify-content: space-between; gap: 12px;
-      padding: 14px 16px; border-radius: 16px; border: 2px solid transparent;
-      border-left-width: 7px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); cursor: pointer;
-    }
-    .m-card.ongoing-border {
-      outline: 3px solid #ef4444; box-shadow: 0 4px 14px rgba(239, 68, 68, 0.2);
-    }
-    .m-time-col {
-      display: flex; flex-direction: column; align-items: flex-start; min-width: 96px;
-    }
-    .m-time-badge {
-      font-size: 0.85rem; font-weight: 900; background: rgba(255,255,255,0.9);
-      padding: 4px 8px; border-radius: 8px; white-space: nowrap;
-    }
-    .m-duration { font-size: 0.74rem; font-weight: 700; opacity: 0.8; margin-top: 4px; padding-left: 2px; }
-
-    .m-subject-col { flex: 1; display: flex; align-items: center; gap: 8px; }
-    .m-subject-name { font-family: 'Jua', sans-serif; font-size: 1.35rem; white-space: nowrap; }
-    .m-now-tag {
-      background: #ef4444; color: #fff; font-size: 0.7rem; font-weight: 900;
-      padding: 3px 7px; border-radius: 99px; white-space: nowrap;
-    }
-    .m-edit-hint {
-      font-size: 0.78rem; font-weight: 800; background: rgba(255,255,255,0.85);
-      padding: 6px 10px; border-radius: 8px; white-space: nowrap;
-    }
-    .m-empty {
-      text-align: center; padding: 28px 16px; background: #f8fafc;
-      border-radius: 14px; border: 1.5px dashed #cbd5e1; color: #64748b; font-weight: 700;
-    }
-
-    /* (B) 모바일 주간 5일 한눈에 보기 (가로 스크롤 없이 화면 폭 100%에 맞춤) */
-    .m-week-grid {
-      display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; width: 100%;
-    }
-    .m-week-col {
-      background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px;
-      display: flex; flex-direction: column; overflow: hidden;
-    }
-    .m-week-col.is-today { background: #fefce8; border-color: #facc15; }
-    .m-week-head {
-      text-align: center; padding: 6px 2px; font-family: 'Jua', sans-serif;
-      font-size: 0.95rem; background: #e2e8f0; color: #1e293b;
-    }
-    .m-week-col.is-today .m-week-head { background: #fef08a; color: #854d0e; }
-    .m-week-items { padding: 4px; display: flex; flex-direction: column; gap: 5px; flex: 1; }
-    .m-mini-block {
-      padding: 6px 3px; border-radius: 8px; text-align: center;
-      border: 1.5px solid transparent; cursor: pointer;
-    }
-    .m-mini-time { font-size: 0.65rem; font-weight: 800; opacity: 0.85; letter-spacing: -0.5px; white-space: nowrap; }
-    .m-mini-sub { font-family: 'Jua', sans-serif; font-size: 0.88rem; margin-top: 2px; word-break: keep-all; line-height: 1.15; }
 
     /* 과목별 파스텔 테마 */
-    .c-school  { background: #f1f5f9; border-color: #cbd5e1; border-bottom-color: #94a3b8; border-left-color: #64748b; color: #1e293b; }
-    .c-library { background: #ffedd5; border-color: #fed7aa; border-bottom-color: #fb923c; border-left-color: #f97316; color: #7c2d12; }
-    .c-swim    { background: #e0f2fe; border-color: #bae6fd; border-bottom-color: #38bdf8; border-left-color: #0284c7; color: #0c4a6e; }
-    .c-study   { background: #fef9c3; border-color: #fde047; border-bottom-color: #eab308; border-left-color: #ca8a04; color: #713f12; }
-    .c-art     { background: #ccfbf1; border-color: #99f6e4; border-bottom-color: #2dd4bf; border-left-color: #0d9488; color: #115e59; }
-    .c-science { background: #ede9fe; border-color: #ddd6fe; border-bottom-color: #a78bfa; border-left-color: #7c3aed; color: #4c1d95; }
-    .c-soccer  { background: #dcfce7; border-color: #bbf7d0; border-bottom-color: #4ade80; border-left-color: #16a34a; color: #14532d; }
-    .c-coding  { background: #fce7f3; border-color: #fbcfe8; border-bottom-color: #f472b6; border-left-color: #db2777; color: #831843; }
-    .c-default { background: #f3f4f6; border-color: #d1d5db; border-bottom-color: #9ca3af; border-left-color: #4b5563; color: #1f2937; }
+    .c-school  { background: #f1f5f9; border-color: #cbd5e1; border-bottom-color: #94a3b8; color: #1e293b; }
+    .c-library { background: #ffedd5; border-color: #fed7aa; border-bottom-color: #fb923c; color: #7c2d12; }
+    .c-swim    { background: #e0f2fe; border-color: #bae6fd; border-bottom-color: #38bdf8; color: #0c4a6e; }
+    .c-study   { background: #fef9c3; border-color: #fde047; border-bottom-color: #eab308; color: #713f12; }
+    .c-art     { background: #ccfbf1; border-color: #99f6e4; border-bottom-color: #2dd4bf; color: #115e59; }
+    .c-science { background: #ede9fe; border-color: #ddd6fe; border-bottom-color: #a78bfa; color: #4c1d95; }
+    .c-soccer  { background: #dcfce7; border-color: #bbf7d0; border-bottom-color: #4ade80; color: #14532d; }
+    .c-coding  { background: #fce7f3; border-color: #fbcfe8; border-bottom-color: #f472b6; color: #831843; }
+    .c-default { background: #f3f4f6; border-color: #d1d5db; border-bottom-color: #9ca3af; color: #1f2937; }
 
     /* 모달 창 스타일 */
     .modal-backdrop {
@@ -306,21 +235,52 @@
     .modal-footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
     .btn.danger { background: #ef4444; color: #fff; border-color: #ef4444; margin-right: auto; }
 
-    /* =====================================================
-       모바일 반응형 분기 (화면 폭 768px 이하 스마트폰)
-       ===================================================== */
+    /* =========================================================
+       모바일 화면(768px 이하)에서 PC 타임라인을 그대로 축소 맞춤
+       ========================================================= */
     @media (max-width: 768px) {
-      header { padding: 10px 12px; }
-      .brand h1 { font-size: 1.25rem; }
-      .btn { padding: 6px 9px; font-size: 0.76rem; }
-      .tab { font-size: 0.92rem; padding: 9px 4px; border-radius: 10px; }
+      :root {
+        --axis-width: 34px; /* 왼쪽 시간축 폭 슬림화 */
+        --col-gap: 4px;     /* 요일 기둥 사이 간격 최적화 */
+      }
+      header { padding: 10px 10px; }
+      .brand h1 { font-size: 1.2rem; }
+      .btn { padding: 6px 8px; font-size: 0.74rem; }
+      .tab { font-size: 0.92rem; padding: 8px 2px; border-radius: 10px; }
 
-      .mobile-view-Toolbar { display: flex; }
-      .desktop-timeline { display: none; }
-      .mobile-container { display: block; }
+      main { margin: 12px auto; padding: 0 6px; gap: 20px; }
+      .timetable-card { padding: 14px 8px 20px; border-radius: 18px; }
 
-      main { margin: 12px auto; gap: 18px; padding: 0 10px; }
-      .timetable-card { padding: 16px 14px; border-radius: 18px; }
+      .board-title-wrap { margin-bottom: 10px; padding: 0 2px; }
+      .board-main-title { font-size: 1.4rem; gap: 6px; }
+      .title-badge { font-size: 0.72rem; padding: 3px 8px; }
+      .quick-person-add { font-size: 0.74rem; padding: 5px 9px; }
+
+      .day-header-row { margin-bottom: 8px; }
+      .corner-empty { font-size: 0.65rem; padding-right: 2px; }
+      .day-pill { padding: 7px 2px; border-radius: 10px; font-size: 0.95rem; border-width: 1.5px; }
+      .day-pill .add-hint { font-size: 0.55rem; letter-spacing: -0.4px; }
+
+      .time-marker { font-size: 0.68rem; right: 3px; letter-spacing: -0.5px; }
+
+      .day-track { border-radius: 10px; border-width: 1px; }
+
+      /* 모바일 블록 내부 텍스트: 좁은 기둥에서도 절대 안 잘리게 상하 배치 */
+      .schedule-block {
+        left: 2px; right: 2px; border-radius: 8px; padding: 3px 2px;
+        border-width: 1.5px; border-bottom-width: 3px;
+      }
+      .block-time {
+        font-size: 0.56rem; font-weight: 800; padding: 1px 3px;
+        margin-bottom: 2px; letter-spacing: -0.6px; border-radius: 4px;
+      }
+      .block-subject {
+        font-size: 0.84rem; line-height: 1.1; letter-spacing: -0.3px;
+      }
+      .schedule-block.compact .block-time { margin-bottom: 1px; font-size: 0.54rem; }
+      .schedule-block.compact .block-subject { font-size: 0.8rem; }
+
+      .now-line::after { font-size: 0.52rem; padding: 1px 3px; top: -13px; right: 1px; }
     }
   </style>
 </head>
@@ -340,17 +300,10 @@
       </div>
     </div>
 
-    <!-- 어린이 필터 탭 (줄바꿈 없는 간결한 문구) -->
     <div class="tabs">
       <button class="tab active" data-filter="ALL" onclick="setFilter('ALL')">전체 (연아·연우)</button>
       <button class="tab" data-filter="연아" onclick="setFilter('연아')">연아 시간표</button>
       <button class="tab" data-filter="연우" onclick="setFilter('연우')">연우 시간표</button>
-    </div>
-
-    <!-- 모바일 전용 요일 선택 & 주간 5일 전환 바 -->
-    <div class="mobile-view-Toolbar">
-      <div class="day-selector" id="mobileDayTabs"></div>
-      <button id="mobileModeBtn" class="mode-switch-btn" onclick="toggleMobileMode()">5일 한눈에</button>
     </div>
   </div>
 </header>
@@ -434,11 +387,8 @@
 
   const BASE_HOUR = 13;
   const END_HOUR = 18;
-  const PX_PER_MIN = 2;
 
   let currentFilter = 'ALL';
-  let selectedMobileDay = getTodayFull() || '월요일';
-  let mobileViewMode = 'DAY'; // 'DAY'(요일별 크게 보기) 또는 'WEEK'(5일 한눈에 보기)
   let apiUrl = localStorage.getItem('GAS_SCHEDULE_URL') || 'https://script.google.com/macros/s/AKfycbyEYzgRCAqi01igEQdt1mY5RXvMFXatZa8Z0TCNO_O9dyL7KOXVCROcA0Tv7YazijYUqw/exec';
 
   let scheduleData = [
@@ -469,6 +419,11 @@
     { rowIndex: 26, id: 25, name: '연우', day: '금요일', startTime: '17:00', endTime: '18:00', subject: '수영' }
   ];
 
+  // 화면 크기에 따라 1분당 픽셀 높이 자동 조절 (PC: 2px, 모바일: 1.75px)
+  function getPxPerMin() {
+    return window.innerWidth <= 768 ? 1.75 : 2.0;
+  }
+
   function timeToMin(tStr) {
     const parts = (tStr || '13:00').split(':');
     return parseInt(parts[0], 10) * 60 + parseInt(parts[1] || '0', 10);
@@ -492,13 +447,6 @@
     return map[new Date().getDay()] || '';
   }
 
-  function isOngoingNow(dayFull, startStr, endStr) {
-    if (dayFull !== getTodayFull()) return false;
-    const now = new Date();
-    const curMin = now.getHours() * 60 + now.getMinutes();
-    return curMin >= timeToMin(startStr) && curMin <= timeToMin(endStr);
-  }
-
   function setBadge(text, state) {
     const el = document.getElementById('syncBadge');
     el.textContent = text;
@@ -513,49 +461,22 @@
     renderBoards();
   }
 
-  function setMobileDay(dayFull) {
-    selectedMobileDay = dayFull;
-    mobileViewMode = 'DAY';
-    renderMobileToolbar();
-    renderBoards();
-  }
-
-  function toggleMobileMode() {
-    mobileViewMode = mobileViewMode === 'DAY' ? 'WEEK' : 'DAY';
-    renderMobileToolbar();
-    renderBoards();
-  }
-
-  function renderMobileToolbar() {
-    const tabWrap = document.getElementById('mobileDayTabs');
-    const modeBtn = document.getElementById('mobileModeBtn');
-    const todayFull = getTodayFull();
-
-    tabWrap.innerHTML = '';
-    DAYS.forEach(d => {
-      const btn = document.createElement('button');
-      const isAct = (mobileViewMode === 'DAY' && selectedMobileDay === d.full);
-      const isTod = d.full === todayFull;
-      btn.className = `day-sel-btn ${isAct ? 'active' : ''} ${isTod ? 'today-dot' : ''}`;
-      btn.textContent = d.short + (isTod ? '(오늘)' : '');
-      btn.onclick = () => setMobileDay(d.full);
-      tabWrap.appendChild(btn);
-    });
-
-    modeBtn.classList.toggle('active', mobileViewMode === 'WEEK');
-    modeBtn.textContent = mobileViewMode === 'WEEK' ? '요일별 크게' : '5일 한눈에';
-  }
-
   function renderBoards() {
     const container = document.getElementById('boardContainer');
     container.innerHTML = '';
     const todayFull = getTodayFull();
     const baseMin = BASE_HOUR * 60;
+    const pxPerMin = getPxPerMin();
+    const hourPx = 60 * pxPerMin;
+    const halfHourPx = 30 * pxPerMin;
+    const totalHeight = 5.5 * hourPx; // 13:00 ~ 18:30
+
+    const isMobile = window.innerWidth <= 768;
 
     const now = new Date();
     const nowMin = now.getHours() * 60 + now.getMinutes();
     const showNowLine = nowMin >= baseMin && nowMin <= (END_HOUR * 60 + 30);
-    const nowTopPx = (nowMin - baseMin) * PX_PER_MIN;
+    const nowTopPx = (nowMin - baseMin) * pxPerMin;
 
     const targets = currentFilter === 'ALL' ? ['연아', '연우'] : [currentFilter];
 
@@ -566,7 +487,7 @@
       const card = document.createElement('section');
       card.className = `timetable-card ${isYeona ? 'yeona-theme' : 'yeonwoo-theme'}`;
 
-      // 상단 타이틀 (한 줄 고정)
+      // 상단 타이틀
       const titleWrap = document.createElement('div');
       titleWrap.className = 'board-title-wrap';
       titleWrap.innerHTML = `
@@ -574,90 +495,11 @@
           <span>${person}의 시간표</span>
           <span class="title-badge">주 ${personItems.length}회</span>
         </div>
-        <button class="quick-person-add" onclick="openQuickAdd('${person}', '${selectedMobileDay}', '14:00')">+ ${person} 추가</button>
+        <button class="quick-person-add" onclick="openQuickAdd('${person}', '${todayFull || '월요일'}', '14:00')">+ ${person} 추가</button>
       `;
       card.appendChild(titleWrap);
 
-      // ---------------------------------------------------------
-      // A. 모바일 전용 컨테이너 (요일별 큼직한 카드 or 5일 한눈에 그리드)
-      // ---------------------------------------------------------
-      const mobileBox = document.createElement('div');
-      mobileBox.className = 'mobile-container';
-
-      if (mobileViewMode === 'DAY') {
-        const listWrap = document.createElement('div');
-        listWrap.className = 'm-day-list';
-
-        const dayItems = personItems
-          .filter(item => item.day === selectedMobileDay)
-          .sort((a, b) => a.startTime.localeCompare(b.startTime));
-
-        if (dayItems.length === 0) {
-          listWrap.innerHTML = `<div class="m-empty">${selectedMobileDay}은 등록된 일정이 없습니다.</div>`;
-        } else {
-          dayItems.forEach(item => {
-            const dur = Math.max(0, timeToMin(item.endTime) - timeToMin(item.startTime));
-            const ongoing = isOngoingNow(item.day, item.startTime, item.endTime);
-            const mCard = document.createElement('div');
-            mCard.className = `m-card ${getColorClass(item.subject)} ${ongoing ? 'ongoing-border' : ''}`;
-            mCard.onclick = () => openEditModal(item, false);
-            mCard.innerHTML = `
-              <div class="m-time-col">
-                <span class="m-time-badge">${item.startTime} ~ ${item.endTime}</span>
-                <span class="m-duration">${dur}분 수업</span>
-              </div>
-              <div class="m-subject-col">
-                <span class="m-subject-name">${item.subject}</span>
-                ${ongoing ? '<span class="m-now-tag">진행중</span>' : ''}
-              </div>
-              <span class="m-edit-hint">수정</span>
-            `;
-            listWrap.appendChild(mCard);
-          });
-        }
-        mobileBox.appendChild(listWrap);
-      } else {
-        // 모바일 5일 한눈에 보기 (가로 스크롤 없이 5열 균등 분할)
-        const weekGrid = document.createElement('div');
-        weekGrid.className = 'm-week-grid';
-
-        DAYS.forEach(d => {
-          const isTod = d.full === todayFull;
-          const col = document.createElement('div');
-          col.className = `m-week-col ${isTod ? 'is-today' : ''}`;
-          col.innerHTML = `<div class="m-week-head">${d.short}</div>`;
-
-          const itemsBox = document.createElement('div');
-          itemsBox.className = 'm-week-items';
-
-          const dayItems = personItems
-            .filter(item => item.day === d.full)
-            .sort((a, b) => a.startTime.localeCompare(b.startTime));
-
-          dayItems.forEach(item => {
-            const mini = document.createElement('div');
-            mini.className = `m-mini-block ${getColorClass(item.subject)}`;
-            mini.onclick = () => openEditModal(item, false);
-            mini.innerHTML = `
-              <div class="m-mini-time">${item.startTime}~${item.endTime}</div>
-              <div class="m-mini-sub">${item.subject}</div>
-            `;
-            itemsBox.appendChild(mini);
-          });
-
-          col.appendChild(itemsBox);
-          weekGrid.appendChild(col);
-        });
-        mobileBox.appendChild(weekGrid);
-      }
-      card.appendChild(mobileBox);
-
-      // ---------------------------------------------------------
-      // B. PC 데스크톱 타임라인 뷰
-      // ---------------------------------------------------------
-      const desktopBox = document.createElement('div');
-      desktopBox.className = 'desktop-timeline';
-
+      // 요일 헤더 (시간 + 월~금 5열)
       const headerRow = document.createElement('div');
       headerRow.className = 'day-header-row';
       headerRow.innerHTML = `<div class="corner-empty">시간</div>`;
@@ -667,37 +509,48 @@
         const pill = document.createElement('div');
         pill.className = `day-pill ${isToday ? 'is-today' : ''}`;
         pill.onclick = () => openQuickAdd(person, d.full, '14:00');
+        const todayLabel = isToday ? (isMobile ? '·오늘' : ' (오늘)') : '';
         pill.innerHTML = `
-          <div>${d.short}${isToday ? ' (오늘)' : ''}</div>
-          <span class="add-hint">+ 일정 추가</span>
+          <div>${d.short}${todayLabel}</div>
+          <span class="add-hint">${isMobile ? '+추가' : '+ 일정 추가'}</span>
         `;
         headerRow.appendChild(pill);
       });
-      desktopBox.appendChild(headerRow);
+      card.appendChild(headerRow);
 
+      // 타임라인 본체 (좌측 시간 눈금 + 월~금 기둥)
       const body = document.createElement('div');
       body.className = 'timeline-body';
+      body.style.height = `${totalHeight}px`;
 
+      // 좌측 시간 눈금 (13:00 ~ 18:00)
       const axis = document.createElement('div');
       axis.className = 'time-axis';
       for (let h = BASE_HOUR; h <= END_HOUR; h++) {
         const marker = document.createElement('div');
         marker.className = 'time-marker';
-        marker.style.top = `${(h - BASE_HOUR) * 60 * PX_PER_MIN}px`;
+        marker.style.top = `${(h - BASE_HOUR) * hourPx}px`;
         marker.textContent = `${h}:00`;
         axis.appendChild(marker);
       }
       body.appendChild(axis);
 
+      // 월~금 5개 기둥 트랙
       DAYS.forEach(d => {
         const isToday = d.full === todayFull;
         const track = document.createElement('div');
         track.className = `day-track ${isToday ? 'is-today' : ''}`;
+        // 1시간 실선 & 30분 보조선 눈금 배경
+        track.style.backgroundImage = `
+          linear-gradient(to bottom, #e2e8f0 1px, transparent 1px),
+          linear-gradient(to bottom, #eef2f6 1px, transparent 1px)
+        `;
+        track.style.backgroundSize = `100% ${hourPx}px, 100% ${halfHourPx}px`;
 
         track.onclick = (e) => {
           if (e.target !== track) return;
           const rect = track.getBoundingClientRect();
-          const clickedHour = Math.min(17, Math.max(13, Math.floor((e.clientY - rect.top) / 120) + BASE_HOUR));
+          const clickedHour = Math.min(17, Math.max(13, Math.floor((e.clientY - rect.top) / hourPx) + BASE_HOUR));
           openQuickAdd(person, d.full, String(clickedHour).padStart(2, '0') + ':00');
         };
 
@@ -712,10 +565,10 @@
         dayItems.forEach(item => {
           const startM = timeToMin(item.startTime);
           const endM = timeToMin(item.endTime);
-          const duration = Math.max(25, endM - startM);
+          const duration = Math.max(28, endM - startM);
 
-          const topPx = Math.max(0, (startM - baseMin) * PX_PER_MIN);
-          const heightPx = duration * PX_PER_MIN - 3;
+          const topPx = Math.max(0, (startM - baseMin) * pxPerMin);
+          const heightPx = duration * pxPerMin - 3;
 
           const block = document.createElement('div');
           const isCompact = duration <= 42;
@@ -738,8 +591,7 @@
         body.appendChild(track);
       });
 
-      desktopBox.appendChild(body);
-      card.appendChild(desktopBox);
+      card.appendChild(body);
       container.appendChild(card);
     });
   }
@@ -824,7 +676,7 @@
       document.getElementById('modalTitle').textContent = '새 시간표 추가';
       document.getElementById('rowIndexInput').value = '';
       document.getElementById('nameInput').value = item ? item.name : (currentFilter === '연우' ? '연우' : '연아');
-      document.getElementById('dayInput').value = item ? item.day : selectedMobileDay;
+      document.getElementById('dayInput').value = item ? item.day : (getTodayFull() || '월요일');
       document.getElementById('startInput').value = item ? item.startTime : '14:00';
       document.getElementById('endInput').value = item ? item.endTime : '15:00';
       document.getElementById('subjectInput').value = '';
@@ -879,10 +731,11 @@
     fetchFromSheet(true);
   }
 
+  window.addEventListener('resize', () => renderBoards());
+
   window.addEventListener('DOMContentLoaded', () => {
     const cached = localStorage.getItem('CACHED_SCHEDULE');
     if (cached) scheduleData = JSON.parse(cached);
-    renderMobileToolbar();
     renderBoards();
     if (apiUrl) fetchFromSheet(true);
 
