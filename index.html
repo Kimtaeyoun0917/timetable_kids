@@ -3,248 +3,292 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>연아·연우 시간표 대시보드</title>
+  <title>연아·연우 시간표</title>
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#2563eb">
+  <meta name="theme-color" content="#6366f1">
+  <!-- 초등학생 가독성이 뛰어난 둥근 한글 웹폰트 로드 -->
+  <link href="https://fonts.googleapis.com/css2?family=Jua&family=Pretendard:wght@500;700;800;900&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #f1f5f9;
-      --card: #ffffff;
-      --text: #0f172a;
-      --sub: #475569;
-      --border: #cbd5e1;
-      --yeona: #db2777;
-      --yeona-light: #fce7f3;
-      --yeonwoo: #2563eb;
-      --yeonwoo-light: #dbeafe;
+      --bg: #f4f6fb;
+      --board-bg: #ffffff;
+      --text: #1e293b;
+      --sub: #64748b;
+      --grid-line: #e2e8f0;
+      --grid-half: #f1f5f9;
+      --yeona-main: #ec4899;
+      --yeona-header: #fce7f3;
+      --yeonwoo-main: #3b82f6;
+      --yeonwoo-header: #dbeafe;
+      --hour-height: 120px; /* 1시간 = 120px (1분 = 2px) */
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Malgun Gothic", sans-serif; }
-    body { background: var(--bg); color: var(--text); padding-bottom: 60px; }
 
-    /* 상단 네비게이션 & 컨트롤 바 */
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard', -apple-system, sans-serif; }
+    body { background: var(--bg); color: var(--text); padding-bottom: 70px; }
+
+    /* 상단 컨트롤 헤더 */
     header {
-      background: var(--card); border-bottom: 2px solid var(--border);
-      padding: 14px 16px; position: sticky; top: 0; z-index: 50;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(8px);
+      border-bottom: 1px solid #e2e8f0; padding: 12px 18px;
+      position: sticky; top: 0; z-index: 60; box-shadow: 0 2px 10px rgba(0,0,0,0.03);
     }
-    .header-top {
-      display: flex; justify-content: space-between; align-items: center;
-      max-width: 1200px; margin: 0 auto 12px; flex-wrap: wrap; gap: 10px;
+    .header-inner {
+      max-width: 1120px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px;
     }
-    .title-area { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-    h1 { font-size: 1.35rem; font-weight: 900; letter-spacing: -0.5px; color: #1e293b; }
-    
-    .sync-badge {
-      font-size: 0.8rem; padding: 4px 10px; border-radius: 99px;
-      background: #e2e8f0; color: #334155; font-weight: 700;
-    }
-    .sync-badge.ok { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
-    .sync-badge.loading { background: #fef9c3; color: #854d0e; border: 1px solid #fde047; }
-    .sync-badge.err { background: #fee2e2; color: #991b1b; }
+    .top-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand h1 { font-family: 'Jua', sans-serif; font-size: 1.5rem; font-weight: 400; color: #1e293b; letter-spacing: 0.5px; }
 
-    .btn-group { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+    .sync-pill {
+      font-size: 0.78rem; font-weight: 800; padding: 4px 10px; border-radius: 99px;
+      background: #e2e8f0; color: #475569;
+    }
+    .sync-pill.ok { background: #dcfce7; color: #15803d; }
+    .sync-pill.loading { background: #fef9c3; color: #854d0e; }
+    .sync-pill.err { background: #fee2e2; color: #b91c1c; }
+
+    .ctrl-btns { display: flex; gap: 6px; align-items: center; }
     .btn {
-      border: 1px solid var(--border); background: #fff; color: var(--text);
-      padding: 8px 12px; border-radius: 10px; font-size: 0.85rem; font-weight: 700;
+      border: 1px solid #cbd5e1; background: #fff; color: #334155;
+      padding: 7px 12px; border-radius: 10px; font-size: 0.82rem; font-weight: 800;
       cursor: pointer; transition: 0.15s;
     }
-    .btn:hover { background: #f8fafc; }
-    .btn.primary { background: #2563eb; color: #fff; border-color: #2563eb; }
-    .btn.primary:hover { background: #1d4ed8; }
-    .btn.add-main { background: #16a34a; color: #fff; border-color: #16a34a; font-size: 0.9rem; padding: 8px 14px; }
-    .btn.add-main:hover { background: #15803d; }
+    .btn:hover { background: #f8fafc; border-color: #94a3b8; }
+    .btn.add-btn { background: #4f46e5; color: #fff; border-color: #4f46e5; padding: 8px 14px; }
+    .btn.add-btn:hover { background: #4338ca; }
 
-    /* 필터 탭 (전체 / 연아 / 연우) */
-    .filter-tabs {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
-      max-width: 1200px; margin: 0 auto;
+    /* 어린이 전환 탭 */
+    .tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .tab {
+      padding: 11px; border-radius: 14px; border: 2px solid #e2e8f0;
+      background: #f8fafc; color: #64748b; font-family: 'Jua', sans-serif;
+      font-size: 1.1rem; cursor: pointer; transition: 0.15s; text-align: center;
     }
-    .tab-btn {
-      padding: 12px; border-radius: 12px; border: 2px solid var(--border);
-      background: #f8fafc; color: var(--sub); font-size: 1rem; font-weight: 800;
-      cursor: pointer; transition: 0.15s;
-    }
-    .tab-btn.active[data-filter="ALL"] { background: #0f172a; color: #fff; border-color: #0f172a; }
-    .tab-btn.active[data-filter="연아"] { background: var(--yeona); color: #fff; border-color: var(--yeona); }
-    .tab-btn.active[data-filter="연우"] { background: var(--yeonwoo); color: #fff; border-color: var(--yeonwoo); }
+    .tab.active[data-filter="ALL"] { background: #1e293b; color: #fff; border-color: #1e293b; box-shadow: 0 4px 10px rgba(30,41,59,0.2); }
+    .tab.active[data-filter="연아"] { background: var(--yeona-main); color: #fff; border-color: var(--yeona-main); box-shadow: 0 4px 10px rgba(236,72,153,0.3); }
+    .tab.active[data-filter="연우"] { background: var(--yeonwoo-main); color: #fff; border-color: var(--yeonwoo-main); box-shadow: 0 4px 10px rgba(59,130,246,0.3); }
 
-    /* 메인 레이아웃 */
-    main { max-width: 1200px; margin: 20px auto; padding: 0 14px; display: flex; flex-direction: column; gap: 32px; }
+    /* 메인 보드 영역 */
+    main { max-width: 1120px; margin: 24px auto; padding: 0 14px; display: flex; flex-direction: column; gap: 40px; }
 
-    /* 자녀별 시간표 보드 */
-    .person-board {
-      background: var(--card); border-radius: 18px; border: 2px solid var(--border);
-      overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    .timetable-card {
+      background: var(--board-bg); border-radius: 28px; padding: 26px 22px 28px;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06); border: 2px solid #e2e8f0;
     }
-    .person-board.yeona-board { border-color: #f472b6; }
-    .person-board.yeonwoo-board { border-color: #60a5fa; }
+    .timetable-card.yeona-theme { border-color: #fbcfe8; }
+    .timetable-card.yeonwoo-theme { border-color: #bfdbfe; }
 
-    .board-header {
-      padding: 14px 20px; display: flex; justify-content: space-between; align-items: center;
-      border-bottom: 2px solid var(--border);
+    /* 보드 상단 타이틀 */
+    .board-title-wrap {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 20px; padding: 0 8px; flex-wrap: wrap; gap: 10px;
     }
-    .board-header.yeona { background: var(--yeona-light); color: #9d174d; border-bottom-color: #f472b6; }
-    .board-header.yeonwoo { background: var(--yeonwoo-light); color: #1e40af; border-bottom-color: #60a5fa; }
-    .board-title { font-size: 1.25rem; font-weight: 900; display: flex; align-items: center; gap: 10px; }
-    .count-pill { font-size: 0.85rem; padding: 4px 10px; border-radius: 99px; background: rgba(255,255,255,0.8); font-weight: 800; }
+    .board-main-title {
+      font-family: 'Jua', sans-serif; font-size: 2rem; letter-spacing: 1px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .yeona-theme .board-main-title { color: #be185d; }
+    .yeonwoo-theme .board-main-title { color: #1d4ed8; }
 
-    /* 초등학생용 시간표 표 구조 */
-    .timetable-wrap { width: 100%; overflow-x: auto; }
-    .timetable {
-      width: 100%; border-collapse: collapse; table-layout: fixed; min-width: 760px;
+    .title-badge {
+      font-family: 'Pretendard', sans-serif; font-size: 0.85rem; font-weight: 800;
+      padding: 5px 12px; border-radius: 99px;
     }
-    .timetable th, .timetable td {
-      border: 1px solid #cbd5e1; vertical-align: top;
-    }
-    .timetable thead th {
-      background: #f8fafc; padding: 12px 8px; font-size: 1.05rem; font-weight: 900;
-      color: #1e293b; text-align: center; border-bottom: 2px solid #94a3b8;
-    }
-    .timetable thead th.time-col-head { width: 88px; background: #e2e8f0; font-size: 0.9rem; }
-    .timetable thead th.today-col { background: #fef08a; color: #854d0e; }
+    .yeona-theme .title-badge { background: #fce7f3; color: #be185d; }
+    .yeonwoo-theme .title-badge { background: #dbeafe; color: #1d4ed8; }
 
-    .time-slot-label {
-      background: #f8fafc; text-align: center; padding: 14px 6px;
-      font-weight: 800; font-size: 0.88rem; color: #334155;
-    }
-    .time-slot-sub { font-size: 0.75rem; color: #64748b; font-weight: 600; margin-top: 2px; }
+    .board-guide { font-size: 0.82rem; color: #64748b; font-weight: 700; }
 
-    .slot-cell { padding: 8px; background: #ffffff; height: 105px; }
-    .slot-cell.today-col { background: #fefce8; }
+    /* 타임라인 스크롤 래퍼 */
+    .timeline-scroll { width: 100%; overflow-x: auto; padding-bottom: 6px; }
+    .timeline-canvas { min-width: 740px; }
 
-    /* 과목 블록 카드 (초등학생 시안성 강화) */
-    .subject-card {
-      border-radius: 12px; padding: 10px 10px 8px; margin-bottom: 8px;
-      border: 2px solid transparent; position: relative;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.06); transition: transform 0.12s;
+    /* 요일 알약(Pill) 헤더 행 */
+    .day-header-row {
+      display: grid; grid-template-columns: 68px repeat(5, 1fr); gap: 12px;
+      margin-bottom: 14px; align-items: center;
     }
-    .subject-card:last-child { margin-bottom: 0; }
-    .subject-card:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.12); }
+    .corner-empty { text-align: center; font-size: 0.78rem; font-weight: 800; color: #94a3b8; }
 
-    .time-chip {
-      display: inline-block; font-size: 0.78rem; font-weight: 800;
-      padding: 2px 7px; border-radius: 6px; background: rgba(255,255,255,0.85);
-      margin-bottom: 5px;
+    .day-pill {
+      padding: 12px 8px; border-radius: 16px; text-align: center;
+      font-family: 'Jua', sans-serif; font-size: 1.3rem; cursor: pointer;
+      transition: transform 0.12s, box-shadow 0.12s; position: relative;
+      user-select: none;
     }
-    .now-badge {
-      display: inline-block; font-size: 0.7rem; font-weight: 900;
-      background: #dc2626; color: #fff; padding: 2px 6px; border-radius: 6px; margin-left: 4px;
+    .yeona-theme .day-pill { background: #ffe4e6; color: #9f1239; border: 2px solid #fecdd3; }
+    .yeonwoo-theme .day-pill { background: #e0f2fe; color: #075985; border: 2px solid #bae6fd; }
+    .day-pill:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.08); }
+    .day-pill.is-today {
+      background: #fef08a !important; color: #854d0e !important;
+      border-color: #facc15 !important; box-shadow: 0 4px 12px rgba(250, 204, 21, 0.35);
     }
-    .subject-title {
-      font-size: 1.12rem; font-weight: 900; line-height: 1.25;
-      margin-bottom: 8px; word-break: keep-all;
+    .day-pill .add-hint {
+      display: block; font-family: 'Pretendard', sans-serif; font-size: 0.68rem;
+      font-weight: 800; opacity: 0.75; margin-top: 2px;
     }
 
-    /* 카드 내 즉시 수정/삭제 버튼 */
-    .card-actions {
-      display: flex; gap: 4px; justify-content: flex-end;
-      border-top: 1px dashed rgba(0,0,0,0.12); padding-top: 6px;
-    }
-    .mini-btn {
-      font-size: 0.74rem; font-weight: 800; padding: 3px 8px;
-      border-radius: 6px; border: 1px solid rgba(0,0,0,0.15);
-      background: rgba(255,255,255,0.9); cursor: pointer; color: #1e293b;
-    }
-    .mini-btn:hover { background: #fff; border-color: #000; }
-    .mini-btn.del { color: #dc2626; }
-
-    /* 과목별 전용 컬러 테마 */
-    .theme-school { background: #fef9c3; border-color: #facc15; color: #713f12; }
-    .theme-library { background: #dcfce7; border-color: #4ade80; color: #14532d; }
-    .theme-swim { background: #e0f2fe; border-color: #38bdf8; color: #0c4a6e; }
-    .theme-study { background: #f3e8ff; border-color: #c084fc; color: #581c87; }
-    .theme-art { background: #fce7f3; border-color: #f472b6; color: #831843; }
-    .theme-science { background: #ccfbf1; border-color: #2dd4bf; color: #134e4a; }
-    .theme-soccer { background: #ffedd5; border-color: #fb923c; color: #7c2d12; }
-    .theme-coding { background: #e0e7ff; border-color: #818cf8; color: #1e1b4b; }
-    .theme-default { background: #f1f5f9; border-color: #94a3b8; color: #1e293b; }
-
-    /* 각 요일 하단 빠른 추가 버튼 */
-    .quick-add-row td { padding: 8px; background: #f8fafc; text-align: center; }
-    .quick-add-btn {
-      width: 100%; padding: 8px; border-radius: 8px; border: 1px dashed #94a3b8;
-      background: #fff; color: #475569; font-size: 0.82rem; font-weight: 800; cursor: pointer;
-    }
-    .quick-add-btn:hover { background: #eff6ff; color: #2563eb; border-color: #2563eb; }
-
-    /* 안내 배너 */
-    .guide-bar {
-      max-width: 1200px; margin: 12px auto 0; padding: 0 14px;
-      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;
-      font-size: 0.85rem; color: #475569; font-weight: 600;
+    /* 시간축 + 요일 기둥 본체 (13:00 ~ 18:30 = 5.5시간 = 660px) */
+    .timeline-body {
+      display: grid; grid-template-columns: 68px repeat(5, 1fr); gap: 12px;
+      position: relative; height: 660px;
     }
 
-    /* 모달 창 */
+    /* 좌측 시간 라벨 열 */
+    .time-axis { position: relative; height: 100%; }
+    .time-marker {
+      position: absolute; left: 0; right: 6px; text-align: right;
+      font-size: 0.88rem; font-weight: 800; color: #64748b;
+      transform: translateY(-50%);
+    }
+
+    /* 요일별 타임라인 트랙 기둥 */
+    .day-track {
+      position: relative; height: 100%; border-radius: 18px;
+      background-color: #f8fafc;
+      border: 1.5px solid #e2e8f0;
+      /* 30분(60px) 점선 및 1시간(120px) 실선 배경 패턴 */
+      background-image:
+        linear-gradient(to bottom, #e2e8f0 1px, transparent 1px),
+        linear-gradient(to bottom, #eef2f6 1px, transparent 1px);
+      background-size: 100% 120px, 100% 60px;
+      overflow: hidden; cursor: pointer;
+    }
+    .day-track.is-today {
+      background-color: #fefce8; border-color: #fde047;
+    }
+
+    /* 시간 비례 과목 스티커 블록 */
+    .schedule-block {
+      position: absolute; left: 6px; right: 6px;
+      border-radius: 14px; padding: 8px 10px;
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
+      text-align: center; cursor: pointer; z-index: 10;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.07);
+      border: 2px solid transparent; border-bottom-width: 5px;
+      transition: transform 0.14s, box-shadow 0.14s;
+      overflow: hidden;
+    }
+    .schedule-block:hover {
+      transform: scale(1.025); z-index: 25;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.14);
+    }
+
+    .block-time {
+      font-size: 0.78rem; font-weight: 800; padding: 2px 8px;
+      border-radius: 99px; background: rgba(255, 255, 255, 0.82);
+      margin-bottom: 4px; letter-spacing: -0.2px; white-space: nowrap;
+    }
+    .block-subject {
+      font-family: 'Jua', sans-serif; font-size: 1.25rem;
+      line-height: 1.15; word-break: keep-all;
+    }
+
+    /* 45분 이하 짧은 수업(예: 13:00~13:35) 컴팩트 레이아웃 자동 전환 */
+    .schedule-block.compact {
+      flex-direction: row; justify-content: space-between; padding: 4px 12px; gap: 6px;
+    }
+    .schedule-block.compact .block-time { margin-bottom: 0; font-size: 0.74rem; padding: 2px 6px; }
+    .schedule-block.compact .block-subject { font-size: 1.08rem; }
+
+    /* 수정 아이콘 힌트 */
+    .edit-badge {
+      position: absolute; top: 6px; right: 8px; font-size: 0.7rem; font-weight: 800;
+      opacity: 0; transition: 0.15s; background: rgba(255,255,255,0.9);
+      padding: 2px 6px; border-radius: 6px;
+    }
+    .schedule-block:hover .edit-badge { opacity: 1; }
+
+    /* 과목별 파스텔 입체 테마 컬러 */
+    .c-school  { background: #f1f5f9; border-color: #cbd5e1; border-bottom-color: #94a3b8; color: #1e293b; }
+    .c-library { background: #ffedd5; border-color: #fed7aa; border-bottom-color: #fb923c; color: #7c2d12; }
+    .c-swim    { background: #e0f2fe; border-color: #bae6fd; border-bottom-color: #38bdf8; color: #0c4a6e; }
+    .c-study   { background: #fef9c3; border-color: #fde047; border-bottom-color: #eab308; color: #713f12; }
+    .c-art     { background: #ccfbf1; border-color: #99f6e4; border-bottom-color: #2dd4bf; color: #115e59; }
+    .c-science { background: #ede9fe; border-color: #ddd6fe; border-bottom-color: #a78bfa; color: #4c1d95; }
+    .c-soccer  { background: #dcfce7; border-color: #bbf7d0; border-bottom-color: #4ade80; color: #14532d; }
+    .c-coding  { background: #fce7f3; border-color: #fbcfe8; border-bottom-color: #f472b6; color: #831843; }
+    .c-default { background: #f3f4f6; border-color: #d1d5db; border-bottom-color: #9ca3af; color: #1f2937; }
+
+    /* 현재 시간 표시 가로선 */
+    .now-line {
+      position: absolute; left: 0; right: 0; height: 2.5px;
+      background: #ef4444; z-index: 30; pointer-events: none;
+    }
+    .now-line::before {
+      content: '현재'; position: absolute; left: 4px; top: -10px;
+      background: #ef4444; color: #fff; font-size: 0.65rem; font-weight: 900;
+      padding: 1px 5px; border-radius: 4px;
+    }
+
+    /* 모달 창 스타일 */
     .modal-backdrop {
-      position: fixed; inset: 0; background: rgba(15,23,42,0.55);
+      position: fixed; inset: 0; background: rgba(15, 23, 42, 0.55);
       display: none; align-items: center; justify-content: center; z-index: 100; padding: 16px;
     }
     .modal-backdrop.open { display: flex; }
     .modal {
-      background: var(--card); width: 100%; max-width: 420px; border-radius: 16px;
-      padding: 22px; box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+      background: #fff; width: 100%; max-width: 420px; border-radius: 22px;
+      padding: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.25);
     }
-    .modal h2 { font-size: 1.2rem; font-weight: 900; margin-bottom: 16px; }
+    .modal h2 { font-family: 'Jua', sans-serif; font-size: 1.45rem; font-weight: 400; margin-bottom: 16px; color: #1e293b; }
     .form-row { margin-bottom: 14px; display: flex; flex-direction: column; gap: 6px; }
-    .form-row label { font-size: 0.85rem; font-weight: 800; color: var(--sub); }
+    .form-row label { font-size: 0.84rem; font-weight: 800; color: #475569; }
     .form-row input, .form-row select {
-      padding: 10px 12px; border: 2px solid var(--border); border-radius: 10px;
-      font-size: 0.95rem; font-weight: 700;
+      padding: 10px 12px; border: 2px solid #cbd5e1; border-radius: 12px;
+      font-size: 0.95rem; font-weight: 700; color: #0f172a;
     }
-    .time-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .subject-presets { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
-    .preset-chip {
-      font-size: 0.78rem; font-weight: 700; padding: 4px 9px; border-radius: 99px;
-      background: #e2e8f0; color: #334155; border: none; cursor: pointer;
+    .time-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .preset-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+    .preset-btn {
+      font-size: 0.78rem; font-weight: 800; padding: 5px 10px; border-radius: 99px;
+      background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; cursor: pointer;
     }
-    .preset-chip:hover { background: #cbd5e1; }
-    .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; }
+    .preset-btn:hover { background: #e2e8f0; }
+    .modal-footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
     .btn.danger { background: #ef4444; color: #fff; border-color: #ef4444; margin-right: auto; }
   </style>
 </head>
 <body>
 
 <header>
-  <div class="header-top">
-    <div class="title-area">
-      <h1>연아·연우 시간표</h1>
-      <span id="syncBadge" class="sync-badge">확인 중...</span>
-      <span id="lastSyncText" style="font-size:0.78rem; color:#64748b; font-weight:600;"></span>
+  <div class="header-inner">
+    <div class="top-bar">
+      <div class="brand">
+        <h1>연아·연우 시간표</h1>
+        <span id="syncBadge" class="sync-pill">연동 확인중</span>
+      </div>
+      <div class="ctrl-btns">
+        <button class="btn" onclick="openApiModal()">API 설정</button>
+        <button class="btn" onclick="fetchFromSheet(true)">새로고침</button>
+        <button class="btn add-btn" onclick="openEditModal()">+ 시간표 추가</button>
+      </div>
     </div>
-    <div class="btn-group">
-      <button class="btn" onclick="openApiModal()">API 설정</button>
-      <button class="btn" onclick="fetchFromSheet(true)">시트 불러오기</button>
-      <button class="btn add-main" onclick="openEditModal()">+ 새 시간표 추가</button>
-    </div>
-  </div>
 
-  <div class="filter-tabs">
-    <button class="tab-btn active" data-filter="ALL" onclick="setFilter('ALL')">전체 보기 (연아 → 연우)</button>
-    <button class="tab-btn" data-filter="연아" onclick="setFilter('연아')">연아 시간표</button>
-    <button class="tab-btn" data-filter="연우" onclick="setFilter('연우')">연우 시간표</button>
+    <div class="tabs">
+      <button class="tab active" data-filter="ALL" onclick="setFilter('ALL')">전체 시간표 (연아 → 연우)</button>
+      <button class="tab" data-filter="연아" onclick="setFilter('연아')">연아의 시간표</button>
+      <button class="tab" data-filter="연우" onclick="setFilter('연우')">연우의 시간표</button>
+    </div>
   </div>
 </header>
 
-<div class="guide-bar">
-  <span>💡 대시보드에서 [추가 / 수정 / 삭제] 하면 구글 시트에 즉시 반영되며, 시트에서 수정한 내용도 자동으로 불러옵니다.</span>
-</div>
+<main id="boardContainer"></main>
 
-<main id="scheduleContainer"></main>
-
-<!-- 일정 추가/수정 모달 -->
+<!-- 일정 추가 / 수정 / 삭제 모달 -->
 <div id="editModal" class="modal-backdrop">
   <div class="modal">
-    <h2 id="modalTitle">시간표 추가</h2>
+    <h2 id="modalTitle">시간표 수정</h2>
     <input type="hidden" id="rowIndexInput">
     <div class="form-row">
-      <label>어린이 선택</label>
+      <label>이름</label>
       <select id="nameInput">
         <option value="연아">연아</option>
         <option value="연우">연우</option>
       </select>
     </div>
     <div class="form-row">
-      <label>요일 선택</label>
+      <label>요일</label>
       <select id="dayInput">
         <option value="월요일">월요일</option>
         <option value="화요일">화요일</option>
@@ -254,30 +298,30 @@
       </select>
     </div>
     <div class="form-row">
-      <label>시작 시간 ~ 종료 시간</label>
-      <div class="time-inputs">
+      <label>시간 설정 (시작 ~ 종료)</label>
+      <div class="time-row">
         <input type="time" id="startInput" required>
         <input type="time" id="endInput" required>
       </div>
     </div>
     <div class="form-row">
-      <label>과목 / 활동명 (직접 입력하거나 아래 버튼 클릭)</label>
-      <input type="text" id="subjectInput" placeholder="예: 수영, 과학탐구, 푸르넷" required>
-      <div class="subject-presets">
-        <button type="button" class="preset-chip" onclick="setPreset('학교수업')">학교수업</button>
-        <button type="button" class="preset-chip" onclick="setPreset('학교도서관')">학교도서관</button>
-        <button type="button" class="preset-chip" onclick="setPreset('수영')">수영</button>
-        <button type="button" class="preset-chip" onclick="setPreset('푸르넷')">푸르넷</button>
-        <button type="button" class="preset-chip" onclick="setPreset('미술')">미술</button>
-        <button type="button" class="preset-chip" onclick="setPreset('과학탐구')">과학탐구</button>
-        <button type="button" class="preset-chip" onclick="setPreset('축구')">축구</button>
-        <button type="button" class="preset-chip" onclick="setPreset('컴퓨터 코딩')">컴퓨터 코딩</button>
+      <label>과목 / 활동명</label>
+      <input type="text" id="subjectInput" placeholder="과목명을 입력하세요" required>
+      <div class="preset-list">
+        <button type="button" class="preset-btn" onclick="pickSubject('학교수업')">학교수업</button>
+        <button type="button" class="preset-btn" onclick="pickSubject('학교도서관')">학교도서관</button>
+        <button type="button" class="preset-btn" onclick="pickSubject('수영')">수영</button>
+        <button type="button" class="preset-btn" onclick="pickSubject('푸르넷')">푸르넷</button>
+        <button type="button" class="preset-btn" onclick="pickSubject('미술')">미술</button>
+        <button type="button" class="preset-btn" onclick="pickSubject('과학탐구')">과학탐구</button>
+        <button type="button" class="preset-btn" onclick="pickSubject('축구')">축구</button>
+        <button type="button" class="preset-btn" onclick="pickSubject('컴퓨터 코딩')">컴퓨터 코딩</button>
       </div>
     </div>
-    <div class="modal-actions">
-      <button id="deleteBtn" class="btn danger" style="display:none;" onclick="deleteFromModal()">삭제</button>
+    <div class="modal-footer">
+      <button id="deleteBtn" class="btn danger" style="display:none;" onclick="deleteSchedule()">삭제</button>
       <button class="btn" onclick="closeEditModal()">취소</button>
-      <button class="btn primary" onclick="saveSchedule()">시트에 저장</button>
+      <button class="btn add-btn" onclick="saveSchedule()">시트에 저장</button>
     </div>
   </div>
 </div>
@@ -285,32 +329,35 @@
 <!-- API 설정 모달 -->
 <div id="apiModal" class="modal-backdrop">
   <div class="modal">
-    <h2>구글 시트 연동 주소(URL) 설정</h2>
+    <h2>구글 시트 연동 URL 설정</h2>
     <div class="form-row">
       <label>Apps Script 웹 앱 URL</label>
       <input type="url" id="apiUrlInput" placeholder="https://script.google.com/macros/s/.../exec">
     </div>
-    <div class="modal-actions">
+    <div class="modal-footer">
       <button class="btn" onclick="closeApiModal()">닫기</button>
-      <button class="btn primary" onclick="saveApiUrl()">저장 후 연동</button>
+      <button class="btn add-btn" onclick="saveApiUrl()">연동 저장</button>
     </div>
   </div>
 </div>
 
 <script>
-  const DAYS = ['월요일', '화요일', '수요일', '목요일', '금요일'];
-  const TIME_SLOTS = [
-    { hour: 13, label: '오후 1시', sub: '13:00 ~ 13:59' },
-    { hour: 14, label: '오후 2시', sub: '14:00 ~ 14:59' },
-    { hour: 15, label: '오후 3시', sub: '15:00 ~ 15:59' },
-    { hour: 16, label: '오후 4시', sub: '16:00 ~ 16:59' },
-    { hour: 17, label: '오후 5시', sub: '17:00 ~ 18:00' }
+  const DAYS = [
+    { full: '월요일', short: '월' },
+    { full: '화요일', short: '화' },
+    { full: '수요일', short: '수' },
+    { full: '목요일', short: '목' },
+    { full: '금요일', short: '금' }
   ];
+
+  // 타임라인 기준 시간: 13:00 ~ 18:30 (1분 = 2px)
+  const BASE_HOUR = 13;
+  const END_HOUR = 18;
+  const PX_PER_MIN = 2;
 
   let currentFilter = 'ALL';
   let apiUrl = localStorage.getItem('GAS_SCHEDULE_URL') || 'https://script.google.com/macros/s/AKfycbyEYzgRCAqi01igEQdt1mY5RXvMFXatZa8Z0TCNO_O9dyL7KOXVCROcA0Tv7YazijYUqw/exec';
 
-  // 기본 데이터
   let scheduleData = [
     { rowIndex: 2, id: 1, name: '연아', day: '월요일', startTime: '13:00', endTime: '13:35', subject: '학교수업' },
     { rowIndex: 3, id: 2, name: '연아', day: '월요일', startTime: '13:40', endTime: '14:50', subject: '학교도서관' },
@@ -339,168 +386,192 @@
     { rowIndex: 26, id: 25, name: '연우', day: '금요일', startTime: '17:00', endTime: '18:00', subject: '수영' }
   ];
 
-  // 과목명에 따른 색상 테마 매핑
-  function getSubjectTheme(subject) {
-    if (!subject) return 'theme-default';
-    if (subject.includes('학교수업') || subject.includes('수업')) return 'theme-school';
-    if (subject.includes('도서관') || subject.includes('독서')) return 'theme-library';
-    if (subject.includes('수영')) return 'theme-swim';
-    if (subject.includes('푸르넷') || subject.includes('수학') || subject.includes('공부')) return 'theme-study';
-    if (subject.includes('미술') || subject.includes('피아노')) return 'theme-art';
-    if (subject.includes('과학')) return 'theme-science';
-    if (subject.includes('축구') || subject.includes('체육') || subject.includes('태권도')) return 'theme-soccer';
-    if (subject.includes('코딩') || subject.includes('컴퓨터')) return 'theme-coding';
-    return 'theme-default';
+  // 'HH:mm' -> 분 단위 숫자 변환
+  function timeToMin(tStr) {
+    const parts = (tStr || '13:00').split(':');
+    return parseInt(parts[0], 10) * 60 + parseInt(parts[1] || '0', 10);
   }
 
-  // 오늘 요일 및 현재 진행 중 여부 계산
-  function getTodayDayName() {
+  // 과목별 색상 클래스 반환
+  function getColorClass(sub) {
+    if (!sub) return 'c-default';
+    if (sub.includes('학교수업') || sub.includes('수업')) return 'c-school';
+    if (sub.includes('도서관') || sub.includes('독서')) return 'c-library';
+    if (sub.includes('수영')) return 'c-swim';
+    if (sub.includes('푸르넷') || sub.includes('수학')) return 'c-study';
+    if (sub.includes('미술') || sub.includes('음악')) return 'c-art';
+    if (sub.includes('과학')) return 'c-science';
+    if (sub.includes('축구') || sub.includes('체육')) return 'c-soccer';
+    if (sub.includes('코딩') || sub.includes('컴퓨터')) return 'c-coding';
+    return 'c-default';
+  }
+
+  function getTodayFull() {
     const map = { 1: '월요일', 2: '화요일', 3: '수요일', 4: '목요일', 5: '금요일' };
     return map[new Date().getDay()] || '';
   }
 
-  function isOngoingNow(day, startTime, endTime) {
-    if (day !== getTodayDayName()) return false;
-    const now = new Date();
-    const cur = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
-    return cur >= startTime && cur <= endTime;
-  }
-
-  function getSlotHour(startTime) {
-    const h = parseInt((startTime || '13:00').split(':')[0], 10);
-    if (isNaN(h) || h < 13) return 13;
-    if (h > 17) return 17;
-    return h;
-  }
-
   function setBadge(text, state) {
-    const badge = document.getElementById('syncBadge');
-    badge.textContent = text;
-    badge.className = 'sync-badge ' + (state || '');
+    const el = document.getElementById('syncBadge');
+    el.textContent = text;
+    el.className = 'sync-pill ' + (state || '');
   }
 
   function setFilter(filter) {
     currentFilter = filter;
-    document.querySelectorAll('.tab-btn').forEach(btn => {
+    document.querySelectorAll('.tab').forEach(btn => {
       btn.classList.toggle('active', btn.dataset.filter === filter);
     });
-    renderSchedule();
+    renderBoards();
   }
 
-  // 초등학생용 시간표 그리드 렌더링 (전체 선택 시 연아 -> 연우 순서)
-  function renderSchedule() {
-    const container = document.getElementById('scheduleContainer');
+  // 시간 비례 타임라인 보드 렌더링
+  function renderBoards() {
+    const container = document.getElementById('boardContainer');
     container.innerHTML = '';
-    const todayName = getTodayDayName();
+    const todayFull = getTodayFull();
+    const baseMin = BASE_HOUR * 60;
 
-    const targetNames = currentFilter === 'ALL' ? ['연아', '연우'] : [currentFilter];
+    // 현재 시간이 13:00~18:30 사이면 빨간 라인 위치 계산
+    const now = new Date();
+    const nowMin = now.getHours() * 60 + now.getMinutes();
+    const showNowLine = nowMin >= baseMin && nowMin <= (END_HOUR * 60 + 30);
+    const nowTopPx = (nowMin - baseMin) * PX_PER_MIN;
 
-    targetNames.forEach(person => {
+    const targets = currentFilter === 'ALL' ? ['연아', '연우'] : [currentFilter];
+
+    targets.forEach(person => {
       const isYeona = person === '연아';
       const personItems = scheduleData.filter(d => d.name === person);
 
-      const board = document.createElement('section');
-      board.className = 'person-board ' + (isYeona ? 'yeona-board' : 'yeonwoo-board');
+      const card = document.createElement('section');
+      card.className = `timetable-card ${isYeona ? 'yeona-theme' : 'yeonwoo-theme'}`;
 
-      const header = document.createElement('div');
-      header.className = 'board-header ' + (isYeona ? 'yeona' : 'yeonwoo');
-      header.innerHTML = `
-        <div class="board-title">
-          <span>${person} 시간표</span>
-          <span class="count-pill">일주일 총 ${personItems.length}개</span>
+      // 상단 타이틀
+      const titleWrap = document.createElement('div');
+      titleWrap.className = 'board-title-wrap';
+      titleWrap.innerHTML = `
+        <div class="board-main-title">
+          <span>${person}의 시간표</span>
+          <span class="title-badge">주 ${personItems.length}회</span>
         </div>
-        <button class="btn" onclick="openQuickAdd('${person}', '${todayName || '월요일'}')">+ ${person} 일정 추가</button>
+        <div class="board-guide">💡 과목 블록을 누르면 수정/삭제, 요일이나 빈 칸을 누르면 새 일정을 추가합니다.</div>
       `;
-      board.appendChild(header);
+      card.appendChild(titleWrap);
 
-      const wrap = document.createElement('div');
-      wrap.className = 'timetable-wrap';
+      const scrollWrap = document.createElement('div');
+      scrollWrap.className = 'timeline-scroll';
 
-      const table = document.createElement('table');
-      table.className = 'timetable';
+      const canvas = document.createElement('div');
+      canvas.className = 'timeline-canvas';
 
-      // 요일 헤더
-      const thead = document.createElement('thead');
-      const headRow = document.createElement('tr');
-      headRow.innerHTML = `<th class="time-col-head">시간</th>`;
-      DAYS.forEach(day => {
-        const isToday = day === todayName;
-        headRow.innerHTML += `<th class="${isToday ? 'today-col' : ''}">${day}${isToday ? ' (오늘)' : ''}</th>`;
-      });
-      thead.appendChild(headRow);
-      table.appendChild(thead);
+      // 요일 헤더 (월~금 알약)
+      const headerRow = document.createElement('div');
+      headerRow.className = 'day-header-row';
+      headerRow.innerHTML = `<div class="corner-empty">시간</div>`;
 
-      // 시간대별 행 (13시 ~ 17시)
-      const tbody = document.createElement('tbody');
-      TIME_SLOTS.forEach(slot => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td class="time-slot-label">
-            <div>${slot.label}</div>
-            <div class="time-slot-sub">${slot.sub}</div>
-          </td>
+      DAYS.forEach(d => {
+        const isToday = d.full === todayFull;
+        const pill = document.createElement('div');
+        pill.className = `day-pill ${isToday ? 'is-today' : ''}`;
+        pill.onclick = () => openQuickAdd(person, d.full, '14:00');
+        pill.innerHTML = `
+          <div>${d.short}${isToday ? ' (오늘)' : ''}</div>
+          <span class="add-hint">+ 일정 추가</span>
         `;
+        headerRow.appendChild(pill);
+      });
+      canvas.appendChild(headerRow);
 
-        DAYS.forEach(day => {
-          const td = document.createElement('td');
-          td.className = 'slot-cell ' + (day === todayName ? 'today-col' : '');
+      // 타임라인 본체 (좌측 시간축 + 5개 요일 기둥)
+      const body = document.createElement('div');
+      body.className = 'timeline-body';
 
-          const cellItems = personItems
-            .filter(item => item.day === day && getSlotHour(item.startTime) === slot.hour)
-            .sort((a, b) => a.startTime.localeCompare(b.startTime));
+      // 좌측 시간 마커 (13:00 ~ 18:00)
+      const axis = document.createElement('div');
+      axis.className = 'time-axis';
+      for (let h = BASE_HOUR; h <= END_HOUR; h++) {
+        const marker = document.createElement('div');
+        marker.className = 'time-marker';
+        marker.style.top = `${(h - BASE_HOUR) * 60 * PX_PER_MIN}px`;
+        marker.textContent = `${h}:00`;
+        axis.appendChild(marker);
+      }
+      body.appendChild(axis);
 
-          cellItems.forEach(item => {
-            const card = document.createElement('div');
-            const themeClass = getSubjectTheme(item.subject);
-            const ongoing = isOngoingNow(item.day, item.startTime, item.endTime);
+      // 월~금 각 트랙 생성 및 시간 비례 블록 배치
+      DAYS.forEach(d => {
+        const isToday = d.full === todayFull;
+        const track = document.createElement('div');
+        track.className = `day-track ${isToday ? 'is-today' : ''}`;
 
-            card.className = `subject-card ${themeClass}`;
-            card.innerHTML = `
-              <div>
-                <span class="time-chip">${item.startTime} ~ ${item.endTime}</span>
-                ${ongoing ? '<span class="now-badge">진행중</span>' : ''}
-              </div>
-              <div class="subject-title">${item.subject}</div>
-              <div class="card-actions">
-                <button class="mini-btn" onclick="openEditModalByRow(${item.rowIndex})">수정</button>
-                <button class="mini-btn del" onclick="deleteByRow(${item.rowIndex}, '${item.name}', '${item.subject}')">삭제</button>
-              </div>
-            `;
-            td.appendChild(card);
-          });
+        // 빈 공간 클릭 시 클릭한 위치의 시간대로 일정 추가 모달 오픈
+        track.onclick = (e) => {
+          if (e.target !== track) return;
+          const rect = track.getBoundingClientRect();
+          const clickY = e.clientY - rect.top;
+          const clickedHour = Math.min(17, Math.max(13, Math.floor(clickY / 120) + BASE_HOUR));
+          const startStr = String(clickedHour).padStart(2, '0') + ':00';
+          openQuickAdd(person, d.full, startStr);
+        };
 
-          tr.appendChild(td);
+        // 오늘 요일이면 현재 시각 라인 표시
+        if (isToday && showNowLine) {
+          const line = document.createElement('div');
+          line.className = 'now-line';
+          line.style.top = `${nowTopPx}px`;
+          track.appendChild(line);
+        }
+
+        const dayItems = personItems.filter(item => item.day === d.full);
+
+        dayItems.forEach(item => {
+          const startM = timeToMin(item.startTime);
+          const endM = timeToMin(item.endTime);
+          const duration = Math.max(25, endM - startM);
+
+          const topPx = Math.max(0, (startM - baseMin) * PX_PER_MIN);
+          const heightPx = duration * PX_PER_MIN - 3; // 블록 간 미세 간격 확보
+
+          const block = document.createElement('div');
+          const colorCls = getColorClass(item.subject);
+          const isCompact = duration <= 42;
+
+          block.className = `schedule-block ${colorCls} ${isCompact ? 'compact' : ''}`;
+          block.style.top = `${topPx}px`;
+          block.style.height = `${heightPx}px`;
+
+          block.onclick = (e) => {
+            e.stopPropagation();
+            openEditModal(item, false);
+          };
+
+          block.innerHTML = `
+            <span class="edit-badge">수정</span>
+            <div class="block-time">${item.startTime}~${item.endTime}</div>
+            <div class="block-subject">${item.subject}</div>
+          `;
+          track.appendChild(block);
         });
 
-        tbody.appendChild(tr);
+        body.appendChild(track);
       });
 
-      // 하단 요일별 빠른 추가 버튼 행
-      const addRow = document.createElement('tr');
-      addRow.className = 'quick-add-row';
-      addRow.innerHTML = `<td class="time-slot-label" style="font-size:0.78rem;">빠른 추가</td>`;
-      DAYS.forEach(day => {
-        const td = document.createElement('td');
-        td.innerHTML = `<button class="quick-add-btn" onclick="openQuickAdd('${person}', '${day}')">+ ${day.charAt(0)}요일 추가</button>`;
-        addRow.appendChild(td);
-      });
-      tbody.appendChild(addRow);
-
-      table.appendChild(tbody);
-      wrap.appendChild(table);
-      board.appendChild(wrap);
-      container.appendChild(board);
+      canvas.appendChild(body);
+      scrollWrap.appendChild(canvas);
+      card.appendChild(scrollWrap);
+      container.appendChild(card);
     });
   }
 
-  // [시트 -> 대시보드] 실시간 불러오기
+  // [시트 -> 대시보드] 데이터 불러오기
   async function fetchFromSheet(showLoading = true) {
     if (!apiUrl) {
-      setBadge('API 설정 필요', 'err');
-      renderSchedule();
+      setBadge('API 미설정', 'err');
+      renderBoards();
       return;
     }
-    if (showLoading) setBadge('시트 동기화 중...', 'loading');
+    if (showLoading) setBadge('동기화 중...', 'loading');
     try {
       const res = await fetch(apiUrl + '?t=' + Date.now());
       const json = await res.json();
@@ -508,29 +579,26 @@
         scheduleData = json.data;
         localStorage.setItem('CACHED_SCHEDULE', JSON.stringify(scheduleData));
         setBadge('시트 연동됨', 'ok');
-        const now = new Date();
-        document.getElementById('lastSyncText').textContent =
-          `최근 동기화: ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
-        renderSchedule();
+        renderBoards();
       } else {
         throw new Error(json.message);
       }
     } catch (e) {
-      setBadge('연동 확인 필요', 'err');
+      setBadge('오프라인 캐시', 'err');
       const cached = localStorage.getItem('CACHED_SCHEDULE');
       if (cached) scheduleData = JSON.parse(cached);
-      renderSchedule();
+      renderBoards();
     }
   }
 
-  // [대시보드 -> 시트] 추가/수정/삭제 전송
+  // [대시보드 -> 시트] 데이터 저장/수정/삭제
   async function sendToSheet(payload) {
     if (!apiUrl) {
-      alert('상단 [API 설정]에서 구글 시트 웹 앱 URL을 먼저 입력해주세요.');
+      alert('상단 [API 설정]에서 구글 시트 웹 앱 URL을 먼저 등록해 주세요.');
       openApiModal();
       return false;
     }
-    setBadge('구글 시트에 반영 중...', 'loading');
+    setBadge('시트 반영 중...', 'loading');
     try {
       const res = await fetch(apiUrl, {
         method: 'POST',
@@ -545,23 +613,20 @@
         throw new Error(json.message);
       }
     } catch (e) {
-      alert('시트 저장 중 오류가 발생했습니다: ' + e.message);
-      setBadge('저장 오류', 'err');
+      alert('시트 저장 오류: ' + e.message);
+      setBadge('저장 실패', 'err');
       return false;
     }
   }
 
-  function setPreset(subjectName) {
-    document.getElementById('subjectInput').value = subjectName;
+  function pickSubject(name) {
+    document.getElementById('subjectInput').value = name;
   }
 
-  function openQuickAdd(person, day) {
-    openEditModal({ name: person, day: day, startTime: '14:00', endTime: '15:00', subject: '' }, true);
-  }
-
-  function openEditModalByRow(rowIndex) {
-    const item = scheduleData.find(d => Number(d.rowIndex) === Number(rowIndex));
-    if (item) openEditModal(item, false);
+  function openQuickAdd(person, dayFull, startTime) {
+    const startH = parseInt(startTime.split(':')[0], 10);
+    const endTime = String(startH + 1).padStart(2, '0') + ':00';
+    openEditModal({ name: person, day: dayFull, startTime, endTime, subject: '' }, true);
   }
 
   function openEditModal(item = null, isNewPreset = false) {
@@ -569,7 +634,7 @@
     const delBtn = document.getElementById('deleteBtn');
 
     if (item && !isNewPreset) {
-      document.getElementById('modalTitle').textContent = '시간표 수정';
+      document.getElementById('modalTitle').textContent = '시간표 수정 / 삭제';
       document.getElementById('rowIndexInput').value = item.rowIndex;
       document.getElementById('nameInput').value = item.name;
       document.getElementById('dayInput').value = item.day;
@@ -603,25 +668,19 @@
     const subject = document.getElementById('subjectInput').value.trim();
 
     if (!startTime || !endTime || !subject) {
-      alert('시작 시간, 종료 시간, 과목명을 모두 입력해주세요.');
+      alert('시간과 과목명을 모두 입력해 주세요.');
       return;
     }
 
     const action = rowIndex ? 'update' : 'add';
-    const payload = { action, rowIndex: Number(rowIndex), name, day, startTime, endTime, subject };
-
     closeEditModal();
-    await sendToSheet(payload);
+    await sendToSheet({ action, rowIndex: Number(rowIndex), name, day, startTime, endTime, subject });
   }
 
-  async function deleteByRow(rowIndex, name, subject) {
-    if (!confirm(`[${name}] ${subject} 일정을 삭제할까요?\n구글 시트에서도 즉시 삭제됩니다.`)) return;
-    await sendToSheet({ action: 'delete', rowIndex: Number(rowIndex) });
-  }
-
-  async function deleteFromModal() {
+  async function deleteSchedule() {
     const rowIndex = document.getElementById('rowIndexInput').value;
-    if (!rowIndex || !confirm('이 일정을 구글 시트에서 삭제할까요?')) return;
+    const subject = document.getElementById('subjectInput').value;
+    if (!rowIndex || !confirm(`[${subject}] 일정을 삭제할까요?\n구글 시트에서도 즉시 삭제됩니다.`)) return;
     closeEditModal();
     await sendToSheet({ action: 'delete', rowIndex: Number(rowIndex) });
   }
@@ -645,13 +704,15 @@
   window.addEventListener('DOMContentLoaded', () => {
     const cached = localStorage.getItem('CACHED_SCHEDULE');
     if (cached) scheduleData = JSON.parse(cached);
-    renderSchedule();
+    renderBoards();
     if (apiUrl) fetchFromSheet(true);
 
-    // 30초마다 구글 시트 변경사항 자동 동기화 (시트 -> 대시보드 자동 반영)
+    // 30초마다 시트 변경사항 자동 반영 및 현재 시간선 갱신
     setInterval(() => {
       if (apiUrl && !document.querySelector('.modal-backdrop.open')) {
         fetchFromSheet(false);
+      } else {
+        renderBoards();
       }
     }, 30000);
   });
