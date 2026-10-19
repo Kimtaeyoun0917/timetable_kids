@@ -15,7 +15,6 @@
       --sub: #64748b;
       --yeona-main: #ec4899;
       --yeonwoo-main: #3b82f6;
-      --px-per-min: 2; /* PC 기본: 1분 = 2px (1시간 = 120px) */
       --axis-width: 58px;
       --col-gap: 10px;
     }
@@ -100,9 +99,7 @@
     .yeona-theme .quick-person-add { color: #be185d; }
     .yeonwoo-theme .quick-person-add { color: #1d4ed8; }
 
-    /* =========================================================
-       PC & 모바일 공통 시간 비례 타임라인 그리드 (5열 고정)
-       ========================================================= */
+    /* 타임라인 그리드 */
     .day-header-row {
       display: grid;
       grid-template-columns: var(--axis-width) repeat(5, minmax(0, 1fr));
@@ -131,16 +128,13 @@
       font-weight: 800; opacity: 0.75; margin-top: 1px;
     }
 
-    /* 타임라인 본체 */
     .timeline-body {
       display: grid;
       grid-template-columns: var(--axis-width) repeat(5, minmax(0, 1fr));
       gap: var(--col-gap);
       position: relative;
-      /* 높이는 JS에서 (5.5시간 * 60분 * pxPerMin)으로 자동 설정 */
     }
 
-    /* 왼쪽 시간 눈금 열 */
     .time-axis { position: relative; height: 100%; }
     .time-marker {
       position: absolute; left: 0; right: 6px; text-align: right;
@@ -148,7 +142,6 @@
       transform: translateY(-50%); white-space: nowrap;
     }
 
-    /* 요일별 기둥 트랙 */
     .day-track {
       position: relative; height: 100%; border-radius: 16px;
       background-color: #f8fafc; border: 1.5px solid #e2e8f0;
@@ -158,9 +151,9 @@
       background-color: #fefce8; border-color: #facc15;
     }
 
-    /* 시간 비례 과목 스티커 블록 */
+    /* 시간 비례 과목 스티커 블록 (줄바꿈 및 자동 폰트 크기 최적화) */
     .schedule-block {
-      position: absolute; left: 5px; right: 5px; border-radius: 12px; padding: 6px 6px;
+      position: absolute; left: 4px; right: 4px; border-radius: 12px; padding: 6px 4px;
       display: flex; flex-direction: column; justify-content: center; align-items: center;
       text-align: center; cursor: pointer; z-index: 10;
       box-shadow: 0 3px 8px rgba(0, 0, 0, 0.06);
@@ -170,22 +163,16 @@
     .schedule-block:hover { transform: scale(1.02); z-index: 25; }
 
     .block-time {
-      font-size: 0.74rem; font-weight: 800; padding: 1px 6px;
-      border-radius: 99px; background: rgba(255, 255, 255, 0.88);
+      font-size: 0.74rem; font-weight: 800; padding: 1px 5px;
+      border-radius: 99px; background: rgba(255, 255, 255, 0.9);
       margin-bottom: 3px; white-space: nowrap; line-height: 1.2;
     }
     .block-subject {
-      font-family: 'Jua', sans-serif; font-size: 1.15rem;
-      line-height: 1.15; word-break: keep-all;
-    }
-
-    /* PC에서 40분 이하 짧은 수업은 가로 일렬 배치 */
-    @media (min-width: 769px) {
-      .schedule-block.compact {
-        flex-direction: row; justify-content: space-between; padding: 4px 10px; gap: 4px;
-      }
-      .schedule-block.compact .block-time { margin-bottom: 0; font-size: 0.72rem; }
-      .schedule-block.compact .block-subject { font-size: 1.05rem; }
+      font-family: 'Jua', sans-serif;
+      font-size: 1.15rem;
+      line-height: 1.15;
+      word-break: keep-all; /* 단어 단위로 깔끔하게 줄바꿈 되도록 설정 */
+      overflow-wrap: break-word;
     }
 
     /* 현재 시간 빨간 가로선 */
@@ -236,51 +223,50 @@
     .btn.danger { background: #ef4444; color: #fff; border-color: #ef4444; margin-right: auto; }
 
     /* =========================================================
-       모바일 화면(768px 이하)에서 PC 타임라인을 그대로 축소 맞춤
+       모바일 화면 최적화 (글자 크기 자동 조절 및 자연스러운 줄바꿈)
        ========================================================= */
     @media (max-width: 768px) {
       :root {
-        --axis-width: 34px; /* 왼쪽 시간축 폭 슬림화 */
-        --col-gap: 4px;     /* 요일 기둥 사이 간격 최적화 */
+        --axis-width: 34px;
+        --col-gap: 3px;
       }
       header { padding: 10px 10px; }
       .brand h1 { font-size: 1.2rem; }
       .btn { padding: 6px 8px; font-size: 0.74rem; }
       .tab { font-size: 0.92rem; padding: 8px 2px; border-radius: 10px; }
 
-      main { margin: 12px auto; padding: 0 6px; gap: 20px; }
-      .timetable-card { padding: 14px 8px 20px; border-radius: 18px; }
+      main { margin: 12px auto; padding: 0 4px; gap: 18px; }
+      .timetable-card { padding: 12px 6px 18px; border-radius: 16px; }
 
-      .board-title-wrap { margin-bottom: 10px; padding: 0 2px; }
-      .board-main-title { font-size: 1.4rem; gap: 6px; }
-      .title-badge { font-size: 0.72rem; padding: 3px 8px; }
-      .quick-person-add { font-size: 0.74rem; padding: 5px 9px; }
+      .board-title-wrap { margin-bottom: 8px; padding: 0 2px; }
+      .board-main-title { font-size: 1.35rem; gap: 6px; }
+      .title-badge { font-size: 0.7rem; padding: 3px 7px; }
+      .quick-person-add { font-size: 0.72rem; padding: 5px 8px; }
 
-      .day-header-row { margin-bottom: 8px; }
-      .corner-empty { font-size: 0.65rem; padding-right: 2px; }
-      .day-pill { padding: 7px 2px; border-radius: 10px; font-size: 0.95rem; border-width: 1.5px; }
-      .day-pill .add-hint { font-size: 0.55rem; letter-spacing: -0.4px; }
+      .day-header-row { margin-bottom: 6px; }
+      .corner-empty { font-size: 0.62rem; padding-right: 2px; }
+      .day-pill { padding: 6px 2px; border-radius: 8px; font-size: 0.88rem; border-width: 1px; }
+      .day-pill .add-hint { font-size: 0.52rem; }
 
-      .time-marker { font-size: 0.68rem; right: 3px; letter-spacing: -0.5px; }
+      .time-marker { font-size: 0.65rem; right: 2px; }
+      .day-track { border-radius: 8px; border-width: 1px; }
 
-      .day-track { border-radius: 10px; border-width: 1px; }
-
-      /* 모바일 블록 내부 텍스트: 좁은 기둥에서도 절대 안 잘리게 상하 배치 */
+      /* 모바일 칸에서 과목명이 길면 '학교/도서관' 등으로 예쁘게 줄바꿈되도록 폰트 크기 축소 */
       .schedule-block {
-        left: 2px; right: 2px; border-radius: 8px; padding: 3px 2px;
+        left: 1px; right: 1px; border-radius: 6px; padding: 4px 2px;
         border-width: 1.5px; border-bottom-width: 3px;
       }
       .block-time {
-        font-size: 0.56rem; font-weight: 800; padding: 1px 3px;
-        margin-bottom: 2px; letter-spacing: -0.6px; border-radius: 4px;
+        font-size: 0.52rem; font-weight: 800; padding: 1px 3px;
+        margin-bottom: 2px; border-radius: 3px;
       }
       .block-subject {
-        font-size: 0.84rem; line-height: 1.1; letter-spacing: -0.3px;
+        font-size: 0.76rem; /* 모바일에서 한눈에 들어오는 최적의 크기 */
+        line-height: 1.12;
+        word-break: break-all; /* 긴 단어도 칸 폭에 맞춰 자동 줄바꿈 */
       }
-      .schedule-block.compact .block-time { margin-bottom: 1px; font-size: 0.54rem; }
-      .schedule-block.compact .block-subject { font-size: 0.8rem; }
 
-      .now-line::after { font-size: 0.52rem; padding: 1px 3px; top: -13px; right: 1px; }
+      .now-line::after { font-size: 0.5rem; padding: 1px 3px; top: -13px; right: 1px; }
     }
   </style>
 </head>
@@ -419,7 +405,6 @@
     { rowIndex: 26, id: 25, name: '연우', day: '금요일', startTime: '17:00', endTime: '18:00', subject: '수영' }
   ];
 
-  // 화면 크기에 따라 1분당 픽셀 높이 자동 조절 (PC: 2px, 모바일: 1.75px)
   function getPxPerMin() {
     return window.innerWidth <= 768 ? 1.75 : 2.0;
   }
@@ -469,7 +454,7 @@
     const pxPerMin = getPxPerMin();
     const hourPx = 60 * pxPerMin;
     const halfHourPx = 30 * pxPerMin;
-    const totalHeight = 5.5 * hourPx; // 13:00 ~ 18:30
+    const totalHeight = 5.5 * hourPx;
 
     const isMobile = window.innerWidth <= 768;
 
@@ -487,7 +472,6 @@
       const card = document.createElement('section');
       card.className = `timetable-card ${isYeona ? 'yeona-theme' : 'yeonwoo-theme'}`;
 
-      // 상단 타이틀
       const titleWrap = document.createElement('div');
       titleWrap.className = 'board-title-wrap';
       titleWrap.innerHTML = `
@@ -499,7 +483,6 @@
       `;
       card.appendChild(titleWrap);
 
-      // 요일 헤더 (시간 + 월~금 5열)
       const headerRow = document.createElement('div');
       headerRow.className = 'day-header-row';
       headerRow.innerHTML = `<div class="corner-empty">시간</div>`;
@@ -518,12 +501,10 @@
       });
       card.appendChild(headerRow);
 
-      // 타임라인 본체 (좌측 시간 눈금 + 월~금 기둥)
       const body = document.createElement('div');
       body.className = 'timeline-body';
       body.style.height = `${totalHeight}px`;
 
-      // 좌측 시간 눈금 (13:00 ~ 18:00)
       const axis = document.createElement('div');
       axis.className = 'time-axis';
       for (let h = BASE_HOUR; h <= END_HOUR; h++) {
@@ -535,12 +516,10 @@
       }
       body.appendChild(axis);
 
-      // 월~금 5개 기둥 트랙
       DAYS.forEach(d => {
         const isToday = d.full === todayFull;
         const track = document.createElement('div');
         track.className = `day-track ${isToday ? 'is-today' : ''}`;
-        // 1시간 실선 & 30분 보조선 눈금 배경
         track.style.backgroundImage = `
           linear-gradient(to bottom, #e2e8f0 1px, transparent 1px),
           linear-gradient(to bottom, #eef2f6 1px, transparent 1px)
@@ -571,8 +550,7 @@
           const heightPx = duration * pxPerMin - 3;
 
           const block = document.createElement('div');
-          const isCompact = duration <= 42;
-          block.className = `schedule-block ${getColorClass(item.subject)} ${isCompact ? 'compact' : ''}`;
+          block.className = `schedule-block ${getColorClass(item.subject)}`;
           block.style.top = `${topPx}px`;
           block.style.height = `${heightPx}px`;
 
@@ -721,7 +699,7 @@
   }
 
   function closeApiModal() {
-    document.getElementById('apiModal').classList.remove('open');
+    document.getElementById('apiModal').classList.add('open').classList.remove('open');
   }
 
   function saveApiUrl() {
