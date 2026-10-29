@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>연아·연우 시간표</title>
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#4f46e5">
+  <meta id="themeMeta" name="theme-color" content="#ffffff">
   <link href="https://fonts.googleapis.com/css2?family=Jua&family=Pretendard:wght@500;700;800;900&display=swap" rel="stylesheet">
   <style>
     /* =========================================================
-       1. 라이트모드 기본 테마 변수
+       1. 기본 라이트 테마 (스마트폰 설정 무관)
        ========================================================= */
     :root {
       --bg: #f4f6fb;
@@ -22,8 +22,6 @@
       --track-today: #fefce8;
       --track-today-border: #facc15;
       --axis-color: #64748b;
-      --grid-line-1: #e2e8f0;
-      --grid-line-2: #eef2f6;
       --modal-bg: #ffffff;
 
       --yeona-main: #ec4899;
@@ -45,9 +43,9 @@
     }
 
     /* =========================================================
-       2. 다크모드 테마 변수 (눈부심 방지 딥 다크)
+       2. 독자적 다크 테마 (버튼 토글로만 진입)
        ========================================================= */
-    body.dark-mode {
+    body.app-dark {
       --bg: #0b1120;
       --card-bg: #1e293b;
       --header-bg: rgba(30, 41, 59, 0.96);
@@ -58,8 +56,6 @@
       --track-today: #1e261a;
       --track-today-border: #ca8a04;
       --axis-color: #94a3b8;
-      --grid-line-1: #283548;
-      --grid-line-2: #1e293b;
       --modal-bg: #1e293b;
 
       /* 다크 과목 색상 */
@@ -75,7 +71,7 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard', -apple-system, sans-serif; }
-    body { background: var(--bg); color: var(--text); padding-bottom: 50px; -webkit-tap-highlight-color: transparent; transition: background 0.2s, color 0.2s; }
+    body { background: var(--bg); color: var(--text); padding-bottom: 50px; -webkit-tap-highlight-color: transparent; transition: background 0.15s, color 0.15s; }
 
     /* 상단 헤더 */
     header {
@@ -105,7 +101,7 @@
     }
     .btn:hover { filter: brightness(0.95); }
     .btn.theme-toggle-btn { background: #e0e7ff; color: #3730a3; border-color: #c7d2fe; }
-    body.dark-mode .btn.theme-toggle-btn { background: #312e81; color: #e0e7ff; border-color: #4338ca; }
+    body.app-dark .btn.theme-toggle-btn { background: #312e81; color: #e0e7ff; border-color: #4338ca; }
     .btn.add-btn { background: #4f46e5; color: #fff; border-color: #4f46e5; }
 
     /* 탭 필터 */
@@ -130,8 +126,8 @@
     }
     .timetable-card.yeona-theme { border-color: #fbcfe8; }
     .timetable-card.yeonwoo-theme { border-color: #bfdbfe; }
-    body.dark-mode .timetable-card.yeona-theme { border-color: #831843; }
-    body.dark-mode .timetable-card.yeonwoo-theme { border-color: #1e3a8a; }
+    body.app-dark .timetable-card.yeona-theme { border-color: #831843; }
+    body.app-dark .timetable-card.yeonwoo-theme { border-color: #1e3a8a; }
 
     .board-title-wrap {
       display: flex; justify-content: space-between; align-items: center;
@@ -176,13 +172,13 @@
     }
     .yeona-theme .day-pill { background: #ffe4e6; color: #9f1239; border: 2px solid #fecdd3; }
     .yeonwoo-theme .day-pill { background: #e0f2fe; color: #075985; border: 2px solid #bae6fd; }
-    body.dark-mode .yeona-theme .day-pill { background: #4c0519; color: #fecdd3; border-color: #881337; }
-    body.dark-mode .yeonwoo-theme .day-pill { background: #082f49; color: #bae6fd; border-color: #0369a1; }
+    body.app-dark .yeona-theme .day-pill { background: #4c0519; color: #fecdd3; border-color: #881337; }
+    body.app-dark .yeonwoo-theme .day-pill { background: #082f49; color: #bae6fd; border-color: #0369a1; }
 
     .day-pill.is-today {
       background: #fef08a !important; color: #854d0e !important; border-color: #facc15 !important;
     }
-    body.dark-mode .day-pill.is-today {
+    body.app-dark .day-pill.is-today {
       background: #713f12 !important; color: #fef08a !important; border-color: #eab308 !important;
     }
     .day-pill .add-hint {
@@ -229,7 +225,7 @@
       border-radius: 99px; background: rgba(0, 0, 0, 0.08);
       margin-bottom: 3px; white-space: nowrap; line-height: 1.2;
     }
-    body.dark-mode .block-time { background: rgba(255, 255, 255, 0.15); }
+    body.app-dark .block-time { background: rgba(255, 255, 255, 0.15); }
 
     .block-subject {
       font-family: 'Jua', sans-serif; font-size: 1.15rem; line-height: 1.15;
@@ -246,7 +242,7 @@
       padding: 1px 4px; border-radius: 4px; line-height: 1.1;
     }
 
-    /* 과목별 파스텔 클래스 */
+    /* 과목별 색상 적용 */
     .c-school  { background: var(--c-school-bg); border-color: var(--c-school-bd); border-bottom-color: var(--c-school-b-bd); color: var(--c-school-t); }
     .c-library { background: var(--c-lib-bg); border-color: var(--c-lib-bd); border-bottom-color: var(--c-lib-b-bd); color: var(--c-lib-t); }
     .c-swim    { background: var(--c-swim-bg); border-color: var(--c-swim-bd); border-bottom-color: var(--c-swim-b-bd); color: var(--c-swim-t); }
@@ -336,7 +332,6 @@
         <span id="syncBadge" class="sync-pill">연동 확인중</span>
       </div>
       <div class="ctrl-btns">
-        <!-- 다크모드 / 라이트모드 전환 버튼 -->
         <button id="themeToggleBtn" class="btn theme-toggle-btn" onclick="toggleDarkMode()">🌙 다크</button>
         <button class="btn" onclick="openApiModal()">API 설정</button>
         <button class="btn" onclick="fetchFromSheet(true)">새로고침</button>
@@ -463,33 +458,40 @@
     { rowIndex: 26, id: 25, name: '연우', day: '금요일', startTime: '17:00', endTime: '18:00', subject: '수영' }
   ];
 
-  /* ---------------- 다크모드 로직 ---------------- */
+  /* ---------------- 스마트폰 설정과 무관한 독자적 테마 로직 ---------------- */
   function initTheme() {
-    const saved = localStorage.getItem('THEME_MODE');
-    if (saved) {
-      if (saved === 'dark') document.body.classList.add('dark-mode');
+    // 오직 사용자가 저장한 값만 확인 (기본값은 라이트 모드)
+    const saved = localStorage.getItem('APP_THEME_CUSTOM') || 'light';
+    if (saved === 'dark') {
+      document.body.classList.add('app-dark');
     } else {
-      // 시스템 설정 감지
-      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        document.body.classList.add('dark-mode');
-      }
+      document.body.classList.remove('app-dark');
     }
-    updateThemeBtn();
+    updateThemeUI();
   }
 
   function toggleDarkMode() {
-    document.body.classList.toggle('dark-mode');
-    const isDark = document.body.classList.contains('dark-mode');
-    localStorage.setItem('THEME_MODE', isDark ? 'dark' : 'light');
-    updateThemeBtn();
-    renderBoards(); // 트랙 배경선 재렌더링
+    const isCurrentlyDark = document.body.classList.contains('app-dark');
+    if (isCurrentlyDark) {
+      document.body.classList.remove('app-dark');
+      localStorage.setItem('APP_THEME_CUSTOM', 'light');
+    } else {
+      document.body.classList.add('app-dark');
+      localStorage.setItem('APP_THEME_CUSTOM', 'dark');
+    }
+    updateThemeUI();
+    renderBoards();
   }
 
-  function updateThemeBtn() {
-    const isDark = document.body.classList.contains('dark-mode');
+  function updateThemeUI() {
+    const isDark = document.body.classList.contains('app-dark');
     const btn = document.getElementById('themeToggleBtn');
+    const meta = document.getElementById('themeMeta');
     if (btn) {
       btn.textContent = isDark ? '☀️ 라이트' : '🌙 다크';
+    }
+    if (meta) {
+      meta.setAttribute('content', isDark ? '#0b1120' : '#ffffff');
     }
   }
 
@@ -546,7 +548,7 @@
     const totalHeight = 5.5 * hourPx;
 
     const isMobile = window.innerWidth <= 768;
-    const isDark = document.body.classList.contains('dark-mode');
+    const isDark = document.body.classList.contains('app-dark');
 
     const lineCol1 = isDark ? '#283548' : '#e2e8f0';
     const lineCol2 = isDark ? '#1e293b' : '#eef2f6';
