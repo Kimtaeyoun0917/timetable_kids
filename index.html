@@ -3,19 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <!-- 브라우저 및 스마트폰 OS에 라이트 모드 전용임을 강제 선언 -->
   <meta name="color-scheme" content="only light">
   <meta name="supported-color-schemes" content="light">
   <meta name="theme-color" content="#ffffff">
-  <title>연아·연우 시간표</title>
+  <title>연아·연우 시간표 & 학원비</title>
   <link rel="manifest" href="manifest.json">
   <link href="https://fonts.googleapis.com/css2?family=Jua&family=Pretendard:wght@500;700;800;900&display=swap" rel="stylesheet">
   <style>
-    /* =========================================================================
-       스마트폰 강제 다크모드(Auto Dark Mode) 원천 차단:
-       단색(background-color) 대신 linear-gradient 배경 이미지를 사용하여
-       갤럭시/크롬의 색상 자동 반전 엔진이 절대 건드리지 못하게 고정합니다.
-       ========================================================================= */
+    /* 스마트폰 다크모드 강제 반전 원천 차단 (100% 라이트 모드 고정) */
     :root, html, body, * {
       color-scheme: only light !important;
       forced-color-adjust: none !important;
@@ -33,14 +28,13 @@
       background-color: #f4f6fb !important;
       background-image: linear-gradient(180deg, #f4f6fb 0%, #f4f6fb 100%) !important;
       color: #1e293b !important;
-      padding-bottom: 50px;
+      padding-bottom: 60px;
       -webkit-tap-highlight-color: transparent;
     }
 
     /* 상단 헤더 */
     header {
-      background-color: #ffffff !important;
-      background-image: linear-gradient(180deg, #ffffff 0%, #ffffff 100%) !important;
+      background-image: linear-gradient(#ffffff, #ffffff) !important;
       border-bottom: 1px solid #e2e8f0 !important;
       padding: 12px 14px;
       position: sticky; top: 0; z-index: 60;
@@ -74,13 +68,13 @@
       color: #ffffff !important; border-color: #4f46e5 !important;
     }
 
-    /* 탭 필터 */
-    .tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    /* 상단 4개 탭 (전체 / 연아 / 연우 / 학원비) */
+    .tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
     .tab {
       padding: 10px 4px; border-radius: 12px; border: 2px solid #e2e8f0 !important;
       background-image: linear-gradient(#f8fafc, #f8fafc) !important;
       color: #64748b !important; font-family: 'Jua', sans-serif;
-      font-size: 1.05rem; cursor: pointer; text-align: center; white-space: nowrap;
+      font-size: 1.02rem; cursor: pointer; text-align: center; white-space: nowrap;
     }
     .tab.active[data-filter="ALL"] {
       background-image: linear-gradient(#1e293b, #1e293b) !important;
@@ -94,12 +88,15 @@
       background-image: linear-gradient(#3b82f6, #3b82f6) !important;
       color: #ffffff !important; border-color: #3b82f6 !important;
     }
+    .tab.active[data-filter="TUITION"] {
+      background-image: linear-gradient(#059669, #059669) !important;
+      color: #ffffff !important; border-color: #059669 !important;
+    }
 
-    /* 메인 보드 */
+    /* 메인 보드 컨테이너 */
     main { max-width: 1120px; margin: 20px auto; padding: 0 12px; display: flex; flex-direction: column; gap: 28px; }
 
     .timetable-card {
-      background-color: #ffffff !important;
       background-image: linear-gradient(#ffffff, #ffffff) !important;
       border-radius: 24px; padding: 22px 18px 26px;
       box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06); border: 2px solid #e2e8f0 !important;
@@ -135,7 +132,7 @@
     .yeona-theme .quick-person-add { color: #be185d !important; border-color: #be185d !important; }
     .yeonwoo-theme .quick-person-add { color: #1d4ed8 !important; border-color: #1d4ed8 !important; }
 
-    /* 타임라인 헤더 & 바디 */
+    /* 타임라인 그리드 */
     .day-header-row {
       display: grid;
       grid-template-columns: var(--axis-width) repeat(5, minmax(0, 1fr));
@@ -190,11 +187,9 @@
       border: 1.5px solid #e2e8f0 !important;
       overflow: hidden; cursor: pointer;
     }
-    .day-track.is-today {
-      border-color: #facc15 !important;
-    }
+    .day-track.is-today { border-color: #facc15 !important; }
 
-    /* 과목 스티커 블록 (밝은 파스텔 고정) */
+    /* 과목 스티커 블록 */
     .schedule-block {
       position: absolute; left: 4px; right: 4px; border-radius: 12px; padding: 6px 4px;
       display: flex; flex-direction: column; justify-content: center; align-items: center;
@@ -228,7 +223,7 @@
       padding: 1px 4px; border-radius: 4px; line-height: 1.1;
     }
 
-    /* 과목별 파스텔 배경 (linear-gradient로 다크모드 반전 완벽 차단) */
+    /* 과목별 파스텔 테마 */
     .c-school  { background-image: linear-gradient(#f1f5f9, #f1f5f9) !important; border-color: #cbd5e1 !important; border-bottom-color: #94a3b8 !important; color: #1e293b !important; }
     .c-library { background-image: linear-gradient(#ffedd5, #ffedd5) !important; border-color: #fed7aa !important; border-bottom-color: #fb923c !important; color: #7c2d12 !important; }
     .c-swim    { background-image: linear-gradient(#e0f2fe, #e0f2fe) !important; border-color: #bae6fd !important; border-bottom-color: #38bdf8 !important; color: #0c4a6e !important; }
@@ -239,6 +234,61 @@
     .c-coding  { background-image: linear-gradient(#fce7f3, #fce7f3) !important; border-color: #fbcfe8 !important; border-bottom-color: #f472b6 !important; color: #831843 !important; }
     .c-default { background-image: linear-gradient(#f3f4f6, #f3f4f6) !important; border-color: #d1d5db !important; border-bottom-color: #9ca3af !important; color: #1f2937 !important; }
 
+    /* =========================================================
+       학원비 관리 탭 전용 스타일
+       ========================================================= */
+    .tuition-summary-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+    }
+    .sum-card {
+      padding: 18px 16px; border-radius: 20px; border: 2px solid #e2e8f0 !important;
+      background-image: linear-gradient(#ffffff, #ffffff) !important;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.04); text-align: center;
+    }
+    .sum-card.yeona-sum { border-color: #fbcfe8 !important; background-image: linear-gradient(#fdf2f8, #fdf2f8) !important; }
+    .sum-card.yeonwoo-sum { border-color: #bfdbfe !important; background-image: linear-gradient(#eff6ff, #eff6ff) !important; }
+    .sum-card.total-sum { border-color: #a7f3d0 !important; background-image: linear-gradient(#ecfdf5, #ecfdf5) !important; }
+
+    .sum-label { font-size: 0.88rem; font-weight: 800; color: #475569 !important; margin-bottom: 6px; }
+    .sum-amount { font-family: 'Jua', sans-serif; font-size: 1.75rem; color: #0f172a !important; }
+    .yeona-sum .sum-amount { color: #be185d !important; }
+    .yeonwoo-sum .sum-amount { color: #1d4ed8 !important; }
+    .total-sum .sum-amount { color: #047857 !important; }
+
+    .tuition-list { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+    .tuition-item {
+      display: flex; justify-content: space-between; align-items: center; gap: 12px;
+      padding: 14px 16px; border-radius: 16px; border: 1.5px solid #e2e8f0 !important;
+      background-image: linear-gradient(#f8fafc, #f8fafc) !important;
+      cursor: pointer; transition: 0.12s;
+    }
+    .tuition-item:hover { border-color: #94a3b8 !important; }
+    .t-left { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .t-subject { font-family: 'Jua', sans-serif; font-size: 1.3rem; color: #1e293b !important; }
+    .t-note {
+      font-size: 0.8rem; font-weight: 700; color: #64748b !important;
+      background-image: linear-gradient(#e2e8f0, #e2e8f0) !important;
+      padding: 3px 8px; border-radius: 8px;
+    }
+    .t-right { display: flex; align-items: center; gap: 12px; }
+    .t-fee { font-family: 'Jua', sans-serif; font-size: 1.35rem; color: #0f172a !important; white-space: nowrap; }
+    .t-edit-btn {
+      font-size: 0.78rem; font-weight: 800; padding: 6px 10px; border-radius: 8px;
+      border: 1px solid #cbd5e1 !important;
+      background-image: linear-gradient(#ffffff, #ffffff) !important;
+      color: #334155 !important; white-space: nowrap;
+    }
+
+    /* 체크박스 박스 스타일 */
+    .sync-rename-box {
+      background-image: linear-gradient(#eef2ff, #eef2ff) !important;
+      border: 1.5px solid #c7d2fe !important;
+      padding: 10px 12px; border-radius: 10px; margin-top: 4px;
+      display: flex; align-items: flex-start; gap: 8px; cursor: pointer;
+    }
+    .sync-rename-box input { width: 18px; height: 18px; margin-top: 2px; cursor: pointer; }
+    .sync-rename-box span { font-size: 0.8rem; font-weight: 800; color: #3730a3 !important; line-height: 1.35; }
+
     /* 모달 */
     .modal-backdrop {
       position: fixed; inset: 0; background: rgba(15, 23, 42, 0.55);
@@ -247,13 +297,13 @@
     .modal-backdrop.open { display: flex; }
     .modal {
       background-image: linear-gradient(#ffffff, #ffffff) !important;
-      width: 100%; max-width: 400px; border-radius: 20px;
+      width: 100%; max-width: 410px; border-radius: 20px;
       padding: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.25); border: 1px solid #e2e8f0 !important;
     }
     .modal h2 { font-family: 'Jua', sans-serif; font-size: 1.35rem; font-weight: 400; margin-bottom: 14px; color: #1e293b !important; }
     .form-row { margin-bottom: 12px; display: flex; flex-direction: column; gap: 5px; }
     .form-row label { font-size: 0.82rem; font-weight: 800; color: #475569 !important; }
-    .form-row input, .form-row select {
+    .form-row input[type="text"], .form-row input[type="number"], .form-row input[type="time"], .form-row input[type="url"], .form-row select {
       padding: 10px; border: 2px solid #cbd5e1 !important; border-radius: 10px;
       font-size: 0.95rem; font-weight: 700;
       background-image: linear-gradient(#ffffff, #ffffff) !important;
@@ -278,10 +328,11 @@
         --axis-width: 34px;
         --col-gap: 3px;
       }
-      header { padding: 10px 10px; }
-      .brand h1 { font-size: 1.2rem; }
-      .btn { padding: 6px 8px; font-size: 0.74rem; }
-      .tab { font-size: 0.92rem; padding: 8px 2px; border-radius: 10px; }
+      header { padding: 10px 8px; }
+      .brand h1 { font-size: 1.18rem; }
+      .btn { padding: 6px 8px; font-size: 0.73rem; }
+      .tabs { gap: 5px; }
+      .tab { font-size: 0.84rem; padding: 8px 2px; border-radius: 10px; }
 
       main { margin: 12px auto; padding: 0 4px; gap: 18px; }
       .timetable-card { padding: 12px 6px 18px; border-radius: 16px; }
@@ -308,10 +359,13 @@
         margin-bottom: 2px; border-radius: 3px;
       }
       .block-subject {
-        font-size: 0.76rem; line-height: 1.12; word-break: break-all;
+        font-size: 0.74rem; line-height: 1.12; word-break: break-all;
       }
 
-      .now-line::after { font-size: 0.5rem; padding: 1px 3px; top: -13px; right: 1px; }
+      .tuition-summary-grid { grid-template-columns: 1fr; gap: 8px; }
+      .sum-card { padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; }
+      .sum-label { margin-bottom: 0; font-size: 0.9rem; }
+      .sum-amount { font-size: 1.4rem; }
     }
   </style>
 </head>
@@ -327,25 +381,27 @@
       <div class="ctrl-btns">
         <button class="btn" onclick="openApiModal()">API 설정</button>
         <button class="btn" onclick="fetchFromSheet(true)">새로고침</button>
-        <button class="btn add-btn" onclick="openEditModal()">+ 추가</button>
+        <button id="topAddBtn" class="btn add-btn" onclick="handleTopAdd()">+ 일정 추가</button>
       </div>
     </div>
 
     <div class="tabs">
-      <button class="tab active" data-filter="ALL" onclick="setFilter('ALL')">전체 (연아·연우)</button>
+      <button class="tab active" data-filter="ALL" onclick="setFilter('ALL')">전체(연아·연우)</button>
       <button class="tab" data-filter="연아" onclick="setFilter('연아')">연아 시간표</button>
       <button class="tab" data-filter="연우" onclick="setFilter('연우')">연우 시간표</button>
+      <button class="tab" data-filter="TUITION" onclick="setFilter('TUITION')">💰 학원비</button>
     </div>
   </div>
 </header>
 
 <main id="boardContainer"></main>
 
-<!-- 일정 추가 / 수정 / 삭제 모달 -->
+<!-- 1. 시간표 추가 / 수정 / 삭제 모달 -->
 <div id="editModal" class="modal-backdrop">
   <div class="modal">
     <h2 id="modalTitle">시간표 수정</h2>
     <input type="hidden" id="rowIndexInput">
+    <input type="hidden" id="originalSubjectInput">
     <div class="form-row">
       <label>이름</label>
       <select id="nameInput">
@@ -383,6 +439,11 @@
         <button type="button" class="preset-btn" onclick="pickSubject('축구')">축구</button>
         <button type="button" class="preset-btn" onclick="pickSubject('컴퓨터 코딩')">컴퓨터 코딩</button>
       </div>
+      <!-- 동일 과목명 일괄 변경 옵션 -->
+      <label id="renameAllWrap" class="sync-rename-box">
+        <input type="checkbox" id="renameAllCheck" checked>
+        <span>이름 변경 시 이 아이의 다른 요일 같은 과목명도 모두 함께 변경 (요일·시간은 각자 유지)</span>
+      </label>
     </div>
     <div class="modal-footer">
       <button id="deleteBtn" class="btn danger" style="display:none;" onclick="deleteSchedule()">삭제</button>
@@ -392,7 +453,39 @@
   </div>
 </div>
 
-<!-- API 설정 모달 -->
+<!-- 2. 학원비 추가 / 수정 / 삭제 모달 -->
+<div id="tuitionModal" class="modal-backdrop">
+  <div class="modal">
+    <h2 id="tuitionModalTitle">학원비 항목 수정</h2>
+    <input type="hidden" id="tRowIndexInput">
+    <div class="form-row">
+      <label>학생명</label>
+      <select id="tNameInput">
+        <option value="연아">연아</option>
+        <option value="연우">연우</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label>과목명</label>
+      <input type="text" id="tSubjectInput" placeholder="예: 수영, 미술, 푸르넷, 축구" required>
+    </div>
+    <div class="form-row">
+      <label>월 수강료 (원 단위 숫자만 입력)</label>
+      <input type="number" id="tFeeInput" placeholder="예: 234000" step="1000" required oninput="autoFillTuitionNote()">
+    </div>
+    <div class="form-row">
+      <label>비고 (자동 생성 또는 직접 입력)</label>
+      <input type="text" id="tNoteInput" placeholder="예: 월 23.4만원">
+    </div>
+    <div class="modal-footer">
+      <button id="tDeleteBtn" class="btn danger" style="display:none;" onclick="deleteTuition()">삭제</button>
+      <button class="btn" onclick="closeTuitionModal()">취소</button>
+      <button class="btn add-btn" onclick="saveTuition()">시트에 저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 3. API 설정 모달 -->
 <div id="apiModal" class="modal-backdrop">
   <div class="modal">
     <h2>구글 시트 연동 URL 설정</h2>
@@ -408,12 +501,14 @@
 </div>
 
 <script>
-  // 기존에 남아있을 수 있는 다크모드 기록 및 구버전 서비스워커 캐시 강제 정리
-  localStorage.removeItem('APP_THEME_CUSTOM');
-  localStorage.removeItem('THEME_MODE');
+  // 구버전 캐시 초기화
   if ('caches' in window) {
     caches.keys().then(keys => keys.forEach(k => caches.delete(k)));
   }
+
+  // 알려주신 Apps Script 웹 앱 주소를 기본값으로 내장
+  const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbyEYzgRCAqi01igEQdt1mY5RXvMFXatZa8Z0TCNO_O9dyL7KOXVCROcA0Tv7YazijYUqw/exec';
+  let apiUrl = localStorage.getItem('GAS_SCHEDULE_URL') || DEFAULT_GAS_URL;
 
   const DAYS = [
     { full: '월요일', short: '월' },
@@ -427,15 +522,15 @@
   const END_HOUR = 18;
 
   let currentFilter = 'ALL';
-  let apiUrl = localStorage.getItem('GAS_SCHEDULE_URL') || '';
 
+  // 첨부된 '시트1' 최신 초기 데이터
   let scheduleData = [
     { rowIndex: 2, id: 1, name: '연아', day: '월요일', startTime: '13:00', endTime: '13:35', subject: '학교수업' },
     { rowIndex: 3, id: 2, name: '연아', day: '월요일', startTime: '13:40', endTime: '14:50', subject: '학교도서관' },
-    { rowIndex: 4, id: 3, name: '연아', day: '월요일', startTime: '15:00', endTime: '16:00', subject: '수영' },
-    { rowIndex: 5, id: 4, name: '연아', day: '월요일', startTime: '16:30', endTime: '18:00', subject: '푸르넷' },
+    { rowIndex: 4, id: 3, name: '연아', day: '월요일', startTime: '15:00', endTime: '16:00', subject: '수영(46.8만원)' },
+    { rowIndex: 5, id: 4, name: '연아', day: '월요일', startTime: '16:30', endTime: '18:00', subject: '푸르넷(30만원)' },
     { rowIndex: 6, id: 5, name: '연아', day: '화요일', startTime: '13:00', endTime: '13:35', subject: '학교수업' },
-    { rowIndex: 7, id: 6, name: '연아', day: '화요일', startTime: '13:40', endTime: '14:40', subject: '미술' },
+    { rowIndex: 7, id: 6, name: '연아', day: '화요일', startTime: '13:40', endTime: '14:40', subject: '미술(14만원)' },
     { rowIndex: 8, id: 7, name: '연아', day: '화요일', startTime: '14:40', endTime: '15:40', subject: '과학탐구' },
     { rowIndex: 9, id: 8, name: '연아', day: '화요일', startTime: '16:30', endTime: '18:00', subject: '푸르넷' },
     { rowIndex: 10, id: 9, name: '연아', day: '수요일', startTime: '13:00', endTime: '13:35', subject: '학교수업' },
@@ -450,11 +545,20 @@
     { rowIndex: 19, id: 18, name: '연아', day: '금요일', startTime: '16:30', endTime: '18:00', subject: '푸르넷' },
     { rowIndex: 20, id: 19, name: '연우', day: '월요일', startTime: '16:00', endTime: '17:00', subject: '수영' },
     { rowIndex: 21, id: 20, name: '연우', day: '화요일', startTime: '13:40', endTime: '14:30', subject: '과학탐구' },
-    { rowIndex: 22, id: 21, name: '연우', day: '화요일', startTime: '16:00', endTime: '17:00', subject: '축구' },
+    { rowIndex: 22, id: 21, name: '연우', day: '화요일', startTime: '16:00', endTime: '17:00', subject: '축구(16만원)' },
     { rowIndex: 23, id: 22, name: '연우', day: '수요일', startTime: '15:10', endTime: '16:30', subject: '컴퓨터 코딩' },
     { rowIndex: 24, id: 23, name: '연우', day: '목요일', startTime: '13:40', endTime: '14:30', subject: '과학탐구' },
     { rowIndex: 25, id: 24, name: '연우', day: '목요일', startTime: '16:00', endTime: '17:00', subject: '축구' },
     { rowIndex: 26, id: 25, name: '연우', day: '금요일', startTime: '17:00', endTime: '18:00', subject: '수영' }
+  ];
+
+  // 첨부된 '과목별 학원비' 초기 데이터
+  let tuitionData = [
+    { rowIndex: 2, name: '연아', subject: '수영', fee: 234000, note: '월 23.4만원' },
+    { rowIndex: 3, name: '연아', subject: '미술', fee: 140000, note: '월 14만원' },
+    { rowIndex: 4, name: '연아', subject: '푸르넷', fee: 300000, note: '월 30만원' },
+    { rowIndex: 5, name: '연우', subject: '수영', fee: 234000, note: '월 23.4만원' },
+    { rowIndex: 6, name: '연우', subject: '축구', fee: 160000, note: '월 16만원' }
   ];
 
   function getPxPerMin() {
@@ -464,6 +568,10 @@
   function timeToMin(tStr) {
     const parts = (tStr || '13:00').split(':');
     return parseInt(parts[0], 10) * 60 + parseInt(parts[1] || '0', 10);
+  }
+
+  function formatKRW(num) {
+    return Number(num || 0).toLocaleString('ko-KR') + '원';
   }
 
   function getColorClass(sub) {
@@ -490,15 +598,36 @@
     el.className = 'sync-pill ' + (state || '');
   }
 
+  function handleTopAdd() {
+    if (currentFilter === 'TUITION') {
+      openTuitionModal();
+    } else {
+      openEditModal();
+    }
+  }
+
   function setFilter(filter) {
     currentFilter = filter;
     document.querySelectorAll('.tab').forEach(btn => {
       btn.classList.toggle('active', btn.dataset.filter === filter);
     });
-    renderBoards();
+    const topAddBtn = document.getElementById('topAddBtn');
+    topAddBtn.textContent = filter === 'TUITION' ? '+ 학원비 추가' : '+ 일정 추가';
+    renderView();
   }
 
-  function renderBoards() {
+  function renderView() {
+    if (currentFilter === 'TUITION') {
+      renderTuitionBoard();
+    } else {
+      renderScheduleBoards();
+    }
+  }
+
+  /* =========================================================
+     시간표 보드 렌더링
+     ========================================================= */
+  function renderScheduleBoards() {
     const container = document.getElementById('boardContainer');
     container.innerHTML = '';
     const todayFull = getTodayFull();
@@ -573,7 +702,6 @@
         const track = document.createElement('div');
         track.className = `day-track ${isToday ? 'is-today' : ''}`;
         const baseTrackBg = isToday ? '#fefce8' : '#f8fafc';
-        // 트랙 배경 역시 linear-gradient로 채워 다크모드 반전 방지
         track.style.backgroundImage = `
           linear-gradient(to bottom, #e2e8f0 1px, transparent 1px),
           linear-gradient(to bottom, #eef2f6 1px, transparent 1px),
@@ -629,10 +757,95 @@
     });
   }
 
+  /* =========================================================
+     학원비 관리 탭 렌더링
+     ========================================================= */
+  function renderTuitionBoard() {
+    const container = document.getElementById('boardContainer');
+    container.innerHTML = '';
+
+    const yeonaItems = tuitionData.filter(t => t.name === '연아');
+    const yeonwooItems = tuitionData.filter(t => t.name === '연우');
+
+    const yeonaSum = yeonaItems.reduce((acc, cur) => acc + Number(cur.fee || 0), 0);
+    const yeonwooSum = yeonwooItems.reduce((acc, cur) => acc + Number(cur.fee || 0), 0);
+    const totalSum = yeonaSum + yeonwooSum;
+
+    // 1. 상단 소계 및 총합 요약 카드
+    const summaryGrid = document.createElement('div');
+    summaryGrid.className = 'tuition-summary-grid';
+    summaryGrid.innerHTML = `
+      <div class="sum-card yeona-sum">
+        <div class="sum-label">연아 학원비 소계 (${yeonaItems.length}과목)</div>
+        <div class="sum-amount">${formatKRW(yeonaSum)}</div>
+      </div>
+      <div class="sum-card yeonwoo-sum">
+        <div class="sum-label">연우 학원비 소계 (${yeonwooItems.length}과목)</div>
+        <div class="sum-amount">${formatKRW(yeonwooSum)}</div>
+      </div>
+      <div class="sum-card total-sum">
+        <div class="sum-label">연아 + 연우 월 총합계</div>
+        <div class="sum-amount">${formatKRW(totalSum)}</div>
+      </div>
+    `;
+    container.appendChild(summaryGrid);
+
+    // 2. 연아 / 연우 과목별 학원비 상세 카드
+    ['연아', '연우'].forEach(person => {
+      const isYeona = person === '연아';
+      const items = isYeona ? yeonaItems : yeonwooItems;
+      const subSum = isYeona ? yeonaSum : yeonwooSum;
+
+      const card = document.createElement('section');
+      card.className = `timetable-card ${isYeona ? 'yeona-theme' : 'yeonwoo-theme'}`;
+
+      const titleWrap = document.createElement('div');
+      titleWrap.className = 'board-title-wrap';
+      titleWrap.innerHTML = `
+        <div class="board-main-title">
+          <span>${person} 학원비 내역</span>
+          <span class="title-badge">소계 ${formatKRW(subSum)}</span>
+        </div>
+        <button class="quick-person-add" onclick="openTuitionModal(null, '${person}')">+ ${person} 학원비 추가</button>
+      `;
+      card.appendChild(titleWrap);
+
+      const list = document.createElement('div');
+      list.className = 'tuition-list';
+
+      if (items.length === 0) {
+        list.innerHTML = `<div style="text-align:center; padding:24px; color:#64748b; font-weight:700;">등록된 학원비 내역이 없습니다.</div>`;
+      } else {
+        items.forEach(item => {
+          const row = document.createElement('div');
+          row.className = 'tuition-item';
+          row.onclick = () => openTuitionModal(item);
+          row.innerHTML = `
+            <div class="t-left">
+              <span class="t-subject">${item.subject}</span>
+              ${item.note ? `<span class="t-note">${item.note}</span>` : ''}
+            </div>
+            <div class="t-right">
+              <span class="t-fee">${formatKRW(item.fee)}</span>
+              <span class="t-edit-btn">수정/삭제</span>
+            </div>
+          `;
+          list.appendChild(row);
+        });
+      }
+
+      card.appendChild(list);
+      container.appendChild(card);
+    });
+  }
+
+  /* =========================================================
+     구글 시트 양방향 통신 (GET / POST)
+     ========================================================= */
   async function fetchFromSheet(showLoading = true) {
     if (!apiUrl) {
       setBadge('API 미설정', 'err');
-      renderBoards();
+      renderView();
       return;
     }
     if (showLoading) setBadge('동기화 중...', 'loading');
@@ -640,28 +853,36 @@
       const res = await fetch(apiUrl + '?t=' + Date.now());
       const json = await res.json();
       if (json.status === 'success') {
-        scheduleData = json.data;
-        localStorage.setItem('CACHED_SCHEDULE', JSON.stringify(scheduleData));
+        if (Array.isArray(json.data)) {
+          scheduleData = json.data;
+          localStorage.setItem('CACHED_SCHEDULE', JSON.stringify(scheduleData));
+        }
+        if (Array.isArray(json.tuition) && json.tuition.length > 0) {
+          tuitionData = json.tuition;
+          localStorage.setItem('CACHED_TUITION', JSON.stringify(tuitionData));
+        }
         setBadge('시트 연동됨', 'ok');
-        renderBoards();
+        renderView();
       } else {
         throw new Error(json.message);
       }
     } catch (e) {
-      setBadge('오프라인 캐시', 'err');
-      const cached = localStorage.getItem('CACHED_SCHEDULE');
-      if (cached) scheduleData = JSON.parse(cached);
-      renderBoards();
+      setBadge('로컬 캐시 모드', 'err');
+      const cachedS = localStorage.getItem('CACHED_SCHEDULE');
+      const cachedT = localStorage.getItem('CACHED_TUITION');
+      if (cachedS) scheduleData = JSON.parse(cachedS);
+      if (cachedT) tuitionData = JSON.parse(cachedT);
+      renderView();
     }
   }
 
   async function sendToSheet(payload) {
     if (!apiUrl) {
-      alert('상단 [API 설정]에서 구글 시트 웹 앱 URL을 먼저 등록해 주세요.');
+      alert('상단 [API 설정]에서 구글 시트 웹 앱 URL을 확인해 주세요.');
       openApiModal();
       return false;
     }
-    setBadge('시트 반영 중...', 'loading');
+    setBadge('시트 저장 중...', 'loading');
     try {
       const res = await fetch(apiUrl, {
         method: 'POST',
@@ -676,12 +897,15 @@
         throw new Error(json.message);
       }
     } catch (e) {
-      alert('시트 저장 오류: ' + e.message);
-      setBadge('저장 실패', 'err');
+      alert('시트 반영 중 오류가 발생했습니다.\nApps Script가 최신 코드로 [새 버전] 배포되었는지 확인해주세요.\n(' + e.message + ')');
+      setBadge('저장 오류', 'err');
       return false;
     }
   }
 
+  /* =========================================================
+     시간표 모달 & 동일 과목명 일괄 변경 제어
+     ========================================================= */
   function pickSubject(name) {
     document.getElementById('subjectInput').value = name;
   }
@@ -695,24 +919,30 @@
   function openEditModal(item = null, isNewPreset = false) {
     const modal = document.getElementById('editModal');
     const delBtn = document.getElementById('deleteBtn');
+    const renameWrap = document.getElementById('renameAllWrap');
 
     if (item && !isNewPreset) {
       document.getElementById('modalTitle').textContent = '시간표 수정 / 삭제';
       document.getElementById('rowIndexInput').value = item.rowIndex;
+      document.getElementById('originalSubjectInput').value = item.subject;
       document.getElementById('nameInput').value = item.name;
       document.getElementById('dayInput').value = item.day;
       document.getElementById('startInput').value = item.startTime;
       document.getElementById('endInput').value = item.endTime;
       document.getElementById('subjectInput').value = item.subject;
+      document.getElementById('renameAllCheck').checked = true;
+      renameWrap.style.display = 'flex';
       delBtn.style.display = 'block';
     } else {
       document.getElementById('modalTitle').textContent = '새 시간표 추가';
       document.getElementById('rowIndexInput').value = '';
+      document.getElementById('originalSubjectInput').value = '';
       document.getElementById('nameInput').value = item ? item.name : (currentFilter === '연우' ? '연우' : '연아');
       document.getElementById('dayInput').value = item ? item.day : (getTodayFull() || '월요일');
       document.getElementById('startInput').value = item ? item.startTime : '14:00';
       document.getElementById('endInput').value = item ? item.endTime : '15:00';
       document.getElementById('subjectInput').value = '';
+      renameWrap.style.display = 'none';
       delBtn.style.display = 'none';
     }
     modal.classList.add('open');
@@ -724,11 +954,13 @@
 
   async function saveSchedule() {
     const rowIndex = document.getElementById('rowIndexInput').value;
+    const oldSubject = document.getElementById('originalSubjectInput').value;
     const name = document.getElementById('nameInput').value;
     const day = document.getElementById('dayInput').value;
     const startTime = document.getElementById('startInput').value;
     const endTime = document.getElementById('endInput').value;
     const subject = document.getElementById('subjectInput').value.trim();
+    const renameAll = document.getElementById('renameAllCheck').checked;
 
     if (!startTime || !endTime || !subject) {
       alert('시간과 과목명을 모두 입력해 주세요.');
@@ -736,8 +968,37 @@
     }
 
     const action = rowIndex ? 'update' : 'add';
+
+    // 화면 즉시 반영 (낙관적 업데이트: 같은 자녀의 동일 과목명 일괄 변경)
+    if (action === 'update') {
+      const targetRow = Number(rowIndex);
+      scheduleData.forEach(item => {
+        if (Number(item.rowIndex) === targetRow) {
+          item.name = name;
+          item.day = day;
+          item.startTime = startTime;
+          item.endTime = endTime;
+          item.subject = subject;
+        } else if (renameAll && oldSubject && item.name === name && item.subject === oldSubject) {
+          item.subject = subject; // 요일과 시간은 유지하고 과목명만 일괄 변경
+        }
+      });
+      localStorage.setItem('CACHED_SCHEDULE', JSON.stringify(scheduleData));
+      renderView();
+    }
+
     closeEditModal();
-    await sendToSheet({ action, rowIndex: Number(rowIndex), name, day, startTime, endTime, subject });
+    await sendToSheet({
+      target: 'schedule',
+      action,
+      rowIndex: Number(rowIndex),
+      name,
+      day,
+      startTime,
+      endTime,
+      subject,
+      renameAll
+    });
   }
 
   async function deleteSchedule() {
@@ -745,7 +1006,95 @@
     const subject = document.getElementById('subjectInput').value;
     if (!rowIndex || !confirm(`[${subject}] 일정을 삭제할까요?\n구글 시트에서도 즉시 삭제됩니다.`)) return;
     closeEditModal();
-    await sendToSheet({ action: 'delete', rowIndex: Number(rowIndex) });
+    await sendToSheet({ target: 'schedule', action: 'delete', rowIndex: Number(rowIndex) });
+  }
+
+  /* =========================================================
+     학원비 모달 제어
+     ========================================================= */
+  function autoFillTuitionNote() {
+    const feeVal = Number(document.getElementById('tFeeInput').value || 0);
+    if (feeVal > 0) {
+      const man = feeVal / 10000;
+      document.getElementById('tNoteInput').value = `월 ${man}만원`;
+    }
+  }
+
+  function openTuitionModal(item = null, defaultPerson = '연아') {
+    const modal = document.getElementById('tuitionModal');
+    const delBtn = document.getElementById('tDeleteBtn');
+
+    if (item) {
+      document.getElementById('tuitionModalTitle').textContent = '학원비 수정 / 삭제';
+      document.getElementById('tRowIndexInput').value = item.rowIndex;
+      document.getElementById('tNameInput').value = item.name;
+      document.getElementById('tSubjectInput').value = item.subject;
+      document.getElementById('tFeeInput').value = item.fee;
+      document.getElementById('tNoteInput').value = item.note || '';
+      delBtn.style.display = 'block';
+    } else {
+      document.getElementById('tuitionModalTitle').textContent = '새 학원비 추가';
+      document.getElementById('tRowIndexInput').value = '';
+      document.getElementById('tNameInput').value = defaultPerson;
+      document.getElementById('tSubjectInput').value = '';
+      document.getElementById('tFeeInput').value = '';
+      document.getElementById('tNoteInput').value = '';
+      delBtn.style.display = 'none';
+    }
+    modal.classList.add('open');
+  }
+
+  function closeTuitionModal() {
+    document.getElementById('tuitionModal').classList.remove('open');
+  }
+
+  async function saveTuition() {
+    const rowIndex = document.getElementById('tRowIndexInput').value;
+    const name = document.getElementById('tNameInput').value;
+    const subject = document.getElementById('tSubjectInput').value.trim();
+    const fee = Number(document.getElementById('tFeeInput').value || 0);
+    const note = document.getElementById('tNoteInput').value.trim();
+
+    if (!subject || !fee) {
+      alert('과목명과 수강료를 입력해 주세요.');
+      return;
+    }
+
+    const action = rowIndex ? 'update' : 'add';
+
+    // 화면 즉시 반영
+    if (action === 'update') {
+      const idx = tuitionData.findIndex(t => Number(t.rowIndex) === Number(rowIndex));
+      if (idx > -1) tuitionData[idx] = { rowIndex: Number(rowIndex), name, subject, fee, note };
+    } else {
+      tuitionData.push({ rowIndex: tuitionData.length + 2, name, subject, fee, note });
+    }
+    localStorage.setItem('CACHED_TUITION', JSON.stringify(tuitionData));
+    renderView();
+
+    closeTuitionModal();
+    await sendToSheet({
+      target: 'tuition',
+      action,
+      rowIndex: Number(rowIndex),
+      name,
+      subject,
+      fee,
+      note
+    });
+  }
+
+  async function deleteTuition() {
+    const rowIndex = document.getElementById('tRowIndexInput').value;
+    const subject = document.getElementById('tSubjectInput').value;
+    if (!rowIndex || !confirm(`[${subject}] 학원비 항목을 삭제할까요?\n구글 시트에서도 즉시 삭제됩니다.`)) return;
+
+    tuitionData = tuitionData.filter(t => Number(t.rowIndex) !== Number(rowIndex));
+    localStorage.setItem('CACHED_TUITION', JSON.stringify(tuitionData));
+    renderView();
+
+    closeTuitionModal();
+    await sendToSheet({ target: 'tuition', action: 'delete', rowIndex: Number(rowIndex) });
   }
 
   function openApiModal() {
@@ -758,25 +1107,27 @@
   }
 
   function saveApiUrl() {
-    apiUrl = document.getElementById('apiUrlInput').value.trim();
+    apiUrl = document.getElementById('apiUrlInput').value.trim() || DEFAULT_GAS_URL;
     localStorage.setItem('GAS_SCHEDULE_URL', apiUrl);
     closeApiModal();
     fetchFromSheet(true);
   }
 
-  window.addEventListener('resize', () => renderBoards());
+  window.addEventListener('resize', () => renderView());
 
   window.addEventListener('DOMContentLoaded', () => {
-    const cached = localStorage.getItem('CACHED_SCHEDULE');
-    if (cached) scheduleData = JSON.parse(cached);
-    renderBoards();
+    const cachedS = localStorage.getItem('CACHED_SCHEDULE');
+    const cachedT = localStorage.getItem('CACHED_TUITION');
+    if (cachedS) scheduleData = JSON.parse(cachedS);
+    if (cachedT) tuitionData = JSON.parse(cachedT);
+    renderView();
     if (apiUrl) fetchFromSheet(true);
 
     setInterval(() => {
       if (apiUrl && !document.querySelector('.modal-backdrop.open')) {
         fetchFromSheet(false);
       } else {
-        renderBoards();
+        renderView();
       }
     }, 30000);
   });
