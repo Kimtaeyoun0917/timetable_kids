@@ -1,0 +1,4 @@
+// 저장소 최상단이 웹앱 루트이므로 android/ 가 Gradle 루트가 된다.
+plugins {
+    id 'com.android.application' version '8.5.2' apply false
+}
